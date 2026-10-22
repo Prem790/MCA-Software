@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "@/features/workspace/styles.css";
 import "@/features/preview/styles/shell.css";
 import "@/features/preview/styles/components.css";
 import "@/features/preview/styles/forms.css";
@@ -11,9 +12,9 @@ import "@/features/preview/styles/login.css";
 import "@/features/preview/styles/responsive.css";
 
 export const metadata: Metadata = {
-  title: "MCA Software · Preview",
+  title: "MCA Software",
   description:
-    "Corporate compliance and practice management. Fictional interface preview.",
+    "Corporate compliance and practice management for professional firms.",
   robots: { index: false, follow: false },
 };
 
