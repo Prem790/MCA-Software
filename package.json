@@ -10,7 +10,7 @@
     "build": "next build && node scripts/prepare-standalone.mjs",
     "start": "node --env-file-if-exists=.env .next/standalone/server.js",
     "lint": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
@@ -21,7 +21,9 @@
     "db:migrate": "tsx --env-file=.env scripts/migrate.ts",
     "db:seed": "tsx --env-file=.env scripts/seed.ts",
     "db:check": "drizzle-kit check",
-    "architecture:check": "depcruise src --config config/dependency-cruiser.cjs"
+    "architecture:check": "depcruise src --config config/dependency-cruiser.cjs",
+    "account:provision": "tsx --conditions=react-server --env-file=.env scripts/provision-account.ts",
+    "test:workspace": "playwright test --config config/playwright.workspace.ts"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "1.7.12",
