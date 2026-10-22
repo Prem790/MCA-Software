@@ -1,0 +1,153 @@
+.login-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: white;
+}
+.login-story {
+  display: flex;
+  flex-direction: column;
+  padding: 42px 10%;
+  background: #eff5f1;
+  color: #507f69;
+}
+.login-story-main {
+  margin: auto 0;
+  padding: 60px 0;
+}
+.login-eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.3px;
+  color: #596b73;
+}
+.login-story h1 {
+  color: #2e6250;
+  font-size: clamp(35px, 4vw, 57px);
+  letter-spacing: -2px;
+  line-height: 1.2;
+  font-weight: 500;
+  margin: 21px 0;
+}
+.login-story h1 > span {
+  color: #596b73;
+}
+.login-story-main > p {
+  max-width: 320px;
+  color: #596b73;
+  line-height: 1.9;
+  font-size: 13px;
+}
+.login-illustration {
+  margin-top: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 370px;
+}
+.login-illustration > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #ffffffc9;
+  box-shadow: 0 6px 20px #3b6d4810;
+  border: 1px solid #e0eae2;
+  border-radius: 9px;
+  padding: 18px;
+}
+.illustration-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e4f0e8;
+  color: #596b73;
+}
+.login-illustration strong {
+  display: block;
+  font-size: 11px;
+  color: #596b73;
+  font-weight: 500;
+}
+.login-illustration small {
+  display: block;
+  font-size: 11px;
+  color: #596b73;
+  margin-top: 4px;
+}
+.illustration-complete {
+  font-size: 11px;
+  background: #edf5ef;
+  color: #596b73;
+  padding: 4px 7px;
+  border-radius: 4px;
+  margin-left: auto;
+}
+.login-story-footer {
+  color: #596b73;
+  font-size: 11px;
+}
+.login-form-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 45px;
+}
+.login-form-card {
+  max-width: 350px;
+  width: 100%;
+}
+.login-form-card h2 {
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: -0.7px;
+  color: #3e6050;
+  margin-top: 23px;
+}
+.login-form-card > p {
+  font-size: 12px;
+  color: #596b73;
+  margin-top: 10px;
+}
+.login-fields {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.login-fields button {
+  margin-top: 3px;
+  font-size: 12px;
+}
+.login-preview-divider {
+  text-align: center;
+  margin: 28px 0;
+  position: relative;
+  border-top: 1px solid #e5ece7;
+}
+.login-preview-divider span {
+  position: relative;
+  top: -9px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  background: white;
+  padding: 0 10px;
+  color: #596b73;
+}
+.login-form-card > a {
+  font-size: 12px;
+}
+.login-form-card .login-preview-note {
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.8;
+  margin-top: 15px;
+}
+.login-form-card .login-small-print {
+  font-size: 11px;
+  text-align: center;
+  margin-top: 35px;
+  line-height: 1.9;
+  color: #596b73;
+}

@@ -1,0 +1,14 @@
+# Optional disposable local database; Neon is the hosted database choice.
+services:
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: mca
+      POSTGRES_PASSWORD: local-development-only
+      POSTGRES_DB: mca_development
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - mca_development:/var/lib/postgresql/data
+volumes:
+  mca_development:
