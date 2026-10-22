@@ -1,0 +1,230 @@
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 17px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  display: block;
+  border: 1px solid #e2e8eb;
+  border-radius: 9px;
+  background: white;
+  padding: 18px 20px 15px;
+  box-shadow: 0 2px 3px #1b303503;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
+}
+.stat-card:hover {
+  border-color: #b8d4c9;
+  transform: translateY(-2px);
+}
+.stat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #596b73;
+}
+.stat-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+}
+.stat-number {
+  display: block;
+  color: #30434a;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -1px;
+  margin: 12px 0 15px;
+}
+.stat-card p {
+  font-size: 11px;
+  color: #596b73;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px;
+}
+.dashboard-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(260px, 1fr);
+  gap: 22px;
+  margin-bottom: 23px;
+}
+.dashboard-top-grid .data-table th,
+.dashboard-top-grid .data-table td {
+  padding-inline: 13px;
+}
+.dashboard-top-grid .data-table th:first-child,
+.dashboard-top-grid .data-table td:first-child {
+  padding-left: 22px;
+}
+.dashboard-top-grid .data-table th:last-child,
+.dashboard-top-grid .data-table td:last-child {
+  padding-right: 18px;
+  padding-left: 0;
+}
+.dashboard-top-grid .table-title {
+  font-size: 11px;
+}
+.dashboard-top-grid .person-cell {
+  font-size: 11px;
+}
+.deadline-list {
+  padding: 0 22px;
+}
+.deadline-item {
+  display: flex;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #edf0f1;
+}
+.deadline-item:last-child {
+  border-bottom: 0;
+}
+.date-square {
+  width: 39px;
+  height: 44px;
+  border: 1px solid #e4eae9;
+  border-radius: 6px;
+  background: #fbfcfb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.date-square strong {
+  color: #596b73;
+  font-size: 15px;
+  line-height: 1.1;
+  font-weight: 600;
+}
+.date-square span {
+  font-size: 11px;
+  color: #596b73;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.deadline-item > div:last-child > strong {
+  color: #4c5d64;
+  font-size: 11px;
+  line-height: 1.4;
+  display: block;
+  font-weight: 500;
+}
+.deadline-item p {
+  font-size: 11px;
+  color: #596b73;
+  margin-top: 3px;
+}
+.deadline-category {
+  display: inline-block;
+  font-size: 11px;
+  color: #596b73;
+  margin-top: 4px;
+}
+.panel-bottom-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-top: 1px solid #edf0f1;
+  min-height: 45px;
+  font-size: 11px;
+  color: #596b73;
+}
+.dashboard-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 22px;
+}
+.portfolio-list {
+  padding: 5px 22px 15px;
+}
+.portfolio-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 25px;
+  gap: 18px;
+  align-items: center;
+  padding: 10px 0;
+}
+.portfolio-row > a {
+  font-size: 11px;
+  color: #65777f;
+}
+.portfolio-row > a:hover {
+  color: #14746b;
+}
+.portfolio-row > span {
+  font-size: 11px;
+  color: #596b73;
+  text-align: right;
+}
+.completion-note {
+  margin: 0 22px 20px;
+  background: #f4f8f5;
+  border: 1px solid #e5eee8;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px;
+}
+.completion-icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  background: #e5f0e8;
+  border-radius: 50%;
+  color: #596b73;
+}
+.completion-note strong {
+  font-size: 11px;
+  font-weight: 500;
+  color: #596b73;
+  display: block;
+}
+.completion-note small {
+  font-size: 11px;
+  color: #596b73;
+  display: block;
+  margin-top: 2px;
+}
+.activity-list {
+  list-style: none;
+  padding: 5px 22px 12px;
+  margin: 0;
+}
+.activity-list li {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 21px;
+}
+.activity-list p {
+  font-size: 11px;
+  color: #596b73;
+  line-height: 1.75;
+}
+.activity-list strong {
+  font-weight: 600;
+  color: #596c74;
+}
+.activity-list a {
+  color: #596b73;
+}
+.activity-list li div > span {
+  font-size: 11px;
+  color: #596b73;
+  display: block;
+  margin-top: 4px;
+}

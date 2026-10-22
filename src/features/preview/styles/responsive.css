@@ -1,0 +1,183 @@
+@media (min-width: 1600px) {
+  .stat-card {
+    padding-block: 23px;
+  }
+  .stat-number {
+    font-size: 37px;
+  }
+  .data-table td {
+    padding-block: 20px;
+  }
+}
+@media (max-width: 1200px) {
+  .dashboard-top-grid,
+  .dashboard-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-grid {
+    gap: 12px;
+  }
+  .stat-card {
+    padding: 15px;
+  }
+  .stat-top {
+    font-size: 11px;
+  }
+  .stat-icon {
+    width: 25px;
+    height: 25px;
+  }
+  .stat-card p {
+    font-size: 11px;
+  }
+  .deadline-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .deadline-item {
+    border: 0;
+  }
+  .detail-grid {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}
+@media (max-width: 1000px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stat-card p {
+    font-size: 11px;
+  }
+  .stat-top {
+    font-size: 11px;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .settings-layout {
+    grid-template-columns: 160px 1fr;
+    gap: 18px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .stat-grid {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .stat-card {
+    padding: 14px;
+  }
+  .stat-top {
+    font-size: 11px;
+  }
+  .stat-number {
+    font-size: 29px;
+    margin: 12px 0;
+  }
+  .stat-card p {
+    font-size: 11px;
+  }
+  .deadline-list {
+    display: block;
+  }
+  .deadline-item {
+    border-bottom: 1px solid #edf0f1;
+  }
+  .portfolio-row {
+    grid-template-columns: 1.4fr 1fr 20px;
+    gap: 12px;
+  }
+  .summary-strip {
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 11px;
+  }
+  .summary-strip-note {
+    margin-left: 0;
+  }
+  .company-detail-heading {
+    flex-wrap: wrap;
+  }
+  .company-detail-heading h1 {
+    font-size: 19px;
+  }
+  .company-detail-heading > .company-mark {
+    width: 45px;
+    height: 48px;
+  }
+  .company-detail-heading button {
+    margin-left: 61px;
+  }
+  .detail-fields {
+    grid-template-columns: 1fr;
+  }
+  .tabs {
+    gap: 23px;
+  }
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .settings-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .settings-nav button {
+    white-space: nowrap;
+    padding: 10px;
+    font-size: 11px;
+  }
+  .checklist-footer,
+  .comment-actions {
+    flex-wrap: wrap;
+  }
+  .document-summary {
+    padding: 18px;
+    gap: 12px;
+  }
+  .document-summary .outline-badge {
+    display: none;
+  }
+  .document-summary p {
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  .calendar-toolbar {
+    padding: 18px;
+  }
+  .calendar-controls {
+    gap: 4px;
+  }
+  .calendar-toolbar h2 {
+    font-size: 15px;
+  }
+  .calendar-toolbar p {
+    font-size: 11px;
+  }
+  .guide-notifications {
+    grid-template-columns: 1fr;
+  }
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+  .login-story {
+    padding: 25px;
+  }
+  .login-story-main {
+    padding: 35px 0 10px;
+  }
+  .login-story h1 {
+    font-size: 37px;
+    letter-spacing: -1px;
+  }
+  .login-illustration,
+  .login-story-footer {
+    display: none;
+  }
+  .login-form-area {
+    padding: 40px 25px;
+  }
+}
