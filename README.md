@@ -67,6 +67,7 @@ src/
   demo/                # Shared deterministic fictional fixture factory
   modules/             # Identity, firms, companies, compliance, tasks, documents, audit
   platform/            # Configuration, auth, database, logging and HTTP helpers
+config/                # Architecture and secret-scanning configuration
 drizzle/               # Reviewed SQL migrations and snapshots
 scripts/               # Explicit migration and fictional seed commands
 tests/                 # Unit, DB integration and browser tests
@@ -111,8 +112,8 @@ To enable a disposable development database:
 See [local development](docs/runbooks/development.md) for local PostgreSQL,
 environment details, seed safeguards and migration review.
 
-| Command                 | Purpose                                                    |
-| ----------------------- | ---------------------------------------------------------- |
+| Command               | Purpose                                                    |
+| --------------------- | ---------------------------------------------------------- |
 | `npm run dev`         | Development server                                         |
 | `npm run check`       | Formatting, lint, architecture, strict types and tests     |
 | `npm run db:generate` | Generate SQL from schema changes without DB access         |
@@ -139,6 +140,12 @@ No infrastructure is provisioned and no deploy runs automatically. See
 [deployment and recovery](docs/runbooks/deployment-recovery.md) and
 [Phase 0 verification](docs/verification/phase-0.md) and
 [Phase 1 verification](docs/verification/phase-1.md) for actual checks and limitations.
+
+Tooling configuration: `.nvmrc` selects Node 24; `package.json` contains the
+shared Prettier settings. Architecture rules live in
+`config/dependency-cruiser.cjs` and are used by `npm run architecture:check`.
+Secret-scanning rules live in `config/gitleaks.toml`; CI passes that path
+explicitly. Local Gitleaks scans should also use `--config config/gitleaks.toml`.
 
 ## Core API / Usage
 

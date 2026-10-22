@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir "$RUNNER_TEMP/mca-source"
           git archive HEAD | tar -x -C "$RUNNER_TEMP/mca-source"
-          docker run --rm -v "$RUNNER_TEMP/mca-source:/repo" ghcr.io/gitleaks/gitleaks:v8.24.3 dir /repo --config /repo/.gitleaks.toml --redact --no-banner
+          docker run --rm -v "$RUNNER_TEMP/mca-source:/repo" ghcr.io/gitleaks/gitleaks:v8.24.3 dir /repo --config /repo/config/gitleaks.toml --redact --no-banner
   container:
     runs-on: ubuntu-latest
     timeout-minutes: 15
