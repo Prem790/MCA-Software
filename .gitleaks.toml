@@ -1,0 +1,11 @@
+title = "MCA Software secret scanning"
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Only deterministic fake credentials in automated test fixtures"
+paths = ['''^tests/''']
+
+[[allowlists]]
+description = "Documented disposable localhost database password, never production configuration"
+paths = ['''^infrastructure/local-database\.yaml$''']
