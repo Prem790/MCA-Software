@@ -4,6 +4,7 @@ out/
 coverage/
 playwright-report/
 test-results/
+
 .env
 .env.*
 !.env.example
@@ -11,3 +12,4 @@ test-results/
 *.log
 .DS_Store
 .work/
+.vercel/

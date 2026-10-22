@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const config: NextConfig = {
-  output: "standalone",
+  // Vercel uses its Next.js adapter; containers retain standalone output.
+  output: process.env.VERCEL === "1" ? undefined : "standalone",
   poweredByHeader: false,
   async headers() {
     return [
