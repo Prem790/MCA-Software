@@ -1,3 +1,4 @@
+import { EdgeState } from "@/features/workspace/edge-state";
 import Link from "next/link";
 import { pageActor } from "@/platform/auth/page-session";
 import { compliance } from "@/platform/application/services";
@@ -15,10 +16,16 @@ export default async function TemplatesPage({
   const parsed = obligationQuery.safeParse(await searchParams);
   if (!parsed.success)
     return (
-      <section className="panel workspace-panel">
-        <h1>Invalid page</h1>
-        <Link href={`/workspace/${firmId}/templates`}>Return to templates</Link>
-      </section>
+      <EdgeState
+        title="Invalid page"
+        action={
+          <Link href={`/workspace/${firmId}/templates`} className="form-cancel">
+            Return to templates
+          </Link>
+        }
+      >
+        Check the template page number.
+      </EdgeState>
     );
   const data = await compliance().templates(actor, parsed.data.page);
   return (
@@ -35,8 +42,10 @@ export default async function TemplatesPage({
       </div>
       {actor.role !== "staff" && (
         <section className="panel workspace-panel">
-          <h2>Create template</h2>
-          <TemplateForm firmId={firmId} />
+          <details className="template-create">
+            <summary>Create template</summary>
+            <TemplateForm firmId={firmId} />
+          </details>
         </section>
       )}
       {data.items.map((template) => (

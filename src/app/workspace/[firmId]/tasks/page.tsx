@@ -1,3 +1,6 @@
+import { EdgeState } from "@/features/workspace/edge-state";
+import { displayLabel } from "@/features/workspace/data-display";
+import { DataPagination } from "@/features/workspace/data-views";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { pageActor, pageRecord } from "@/platform/auth/page-session";
@@ -18,10 +21,16 @@ export default async function TasksPage({
   const parsed = taskQuery.safeParse(await searchParams);
   if (!parsed.success)
     return (
-      <section className="panel workspace-panel">
-        <h1>Invalid filters</h1>
-        <Link href={path}>Clear filters</Link>
-      </section>
+      <EdgeState
+        title="Invalid filters"
+        action={
+          <Link href={path} className="form-cancel">
+            Clear filters
+          </Link>
+        }
+      >
+        Check the search, due window and page number.
+      </EdgeState>
     );
   const query = parsed.data;
   const data = await tasks().list(actor, query);
@@ -140,7 +149,7 @@ export default async function TasksPage({
               <option value="all">All statuses</option>
               {taskStatuses.map((status) => (
                 <option key={status} value={status}>
-                  {status.replaceAll("_", " ")}
+                  {displayLabel(status)}
                 </option>
               ))}
             </select>
@@ -151,7 +160,7 @@ export default async function TasksPage({
               <option value="all">All priorities</option>
               {taskPriorities.map((priority) => (
                 <option key={priority} value={priority}>
-                  {priority}
+                  {displayLabel(priority)}
                 </option>
               ))}
             </select>
@@ -178,18 +187,18 @@ export default async function TasksPage({
             Clear
           </Link>
         </form>
-        <TaskTable firmId={firmId} items={data.items} />
-        <nav className="workspace-pagination" aria-label="Task pages">
-          <span>
-            {data.total} tasks · page {query.page}
-          </span>
-          {query.page > 1 && (
-            <Link href={pageLink(query.page - 1)}>Previous page</Link>
-          )}
-          {query.page * 20 < data.total && (
-            <Link href={pageLink(query.page + 1)}>Next page</Link>
-          )}
-        </nav>
+        <TaskTable
+          firmId={firmId}
+          items={data.items}
+          canCreate={actor.role !== "staff"}
+        />
+        <DataPagination
+          label="Task pages"
+          total={data.total}
+          page={query.page}
+          count={data.items.length}
+          pageLink={pageLink}
+        />
       </section>
     </>
   );

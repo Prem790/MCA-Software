@@ -1,3 +1,5 @@
+import { EdgeState } from "@/features/workspace/edge-state";
+import { DataPagination } from "@/features/workspace/data-views";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { pageActor, pageRecord } from "@/platform/auth/page-session";
@@ -17,10 +19,16 @@ export default async function ObligationsPage({
   const path = `/workspace/${firmId}/obligations`;
   if (!parsed.success)
     return (
-      <section className="panel workspace-panel">
-        <h1>Invalid filters</h1>
-        <Link href={path}>Clear filters</Link>
-      </section>
+      <EdgeState
+        title="Invalid filters"
+        action={
+          <Link href={path} className="form-cancel">
+            Clear filters
+          </Link>
+        }
+      >
+        Check the search, due window and page number.
+      </EdgeState>
     );
   const query = parsed.data;
   const data = await compliance().list(actor, query);
@@ -50,9 +58,11 @@ export default async function ObligationsPage({
           </p>
         </div>
         <div className="workspace-actions">
-          <Link className="text-link" href={`/workspace/${firmId}/templates`}>
-            Template library
-          </Link>
+          {actor.role !== "staff" && (
+            <Link className="text-link" href={`/workspace/${firmId}/templates`}>
+              Template library
+            </Link>
+          )}
           {actor.role !== "staff" && (
             <Button asChild>
               <Link href={`${path}/new`}>New obligation</Link>
@@ -110,18 +120,18 @@ export default async function ObligationsPage({
             Clear
           </Link>
         </form>
-        <ObligationTable firmId={firmId} items={data.items} />
-        <nav className="workspace-pagination" aria-label="Obligation pages">
-          <span>
-            {data.total} obligations · page {query.page}
-          </span>
-          {query.page > 1 && (
-            <Link href={pageLink(query.page - 1)}>Previous page</Link>
-          )}
-          {query.page * 20 < data.total && (
-            <Link href={pageLink(query.page + 1)}>Next page</Link>
-          )}
-        </nav>
+        <ObligationTable
+          firmId={firmId}
+          items={data.items}
+          canCreate={actor.role !== "staff"}
+        />
+        <DataPagination
+          label="Obligation pages"
+          total={data.total}
+          page={query.page}
+          count={data.items.length}
+          pageLink={pageLink}
+        />
       </section>
     </>
   );

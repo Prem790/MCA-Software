@@ -1,3 +1,5 @@
+import { DataBadge, DateLabel } from "@/features/workspace/data-views";
+import { displayLabel } from "@/features/workspace/data-display";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,8 +56,8 @@ export default async function ObligationPage({
           <p className="eyebrow">{record.companyName}</p>
           <h1>{record.title}</h1>
           <p className="page-description">
-            {record.reportingPeriod} · due {record.dueDate} ·{" "}
-            {record.recurrence}
+            {record.reportingPeriod} · due <DateLabel value={record.dueDate} />{" "}
+            · {displayLabel(record.recurrence)}
           </p>
         </div>
         {writable && record.dueDateConfirmedAt && (
@@ -93,7 +95,17 @@ export default async function ObligationPage({
               <p className="work-preserve">
                 {record.description || "No instructions provided."}
               </p>
-              <p>Confirmed: {record.dueDateConfirmedAt ? "Yes" : "No"}</p>
+              <p>
+                <DataBadge
+                  value={
+                    record.dueDateConfirmedAt ? "confirmed" : "unconfirmed"
+                  }
+                >
+                  {record.dueDateConfirmedAt
+                    ? "User confirmed"
+                    : "Needs confirmation"}
+                </DataBadge>
+              </p>
             </>
           )}
           <Link
@@ -117,7 +129,11 @@ export default async function ObligationPage({
       )}
       <section className="panel workspace-panel">
         <h2>Linked tasks · {linked.total}</h2>
-        <TaskTable firmId={firmId} items={linked.items} />
+        <TaskTable
+          firmId={firmId}
+          items={linked.items}
+          canCreate={writable && !!record.dueDateConfirmedAt}
+        />
         {linked.total > 20 && (
           <Link
             className="text-link"

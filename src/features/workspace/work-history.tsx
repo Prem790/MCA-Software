@@ -1,3 +1,4 @@
+import { displayTimestamp, displayLabel } from "./data-display";
 export function WorkHistory({
   events,
 }: {
@@ -16,17 +17,10 @@ export function WorkHistory({
         <ul className="workspace-activity">
           {events.map((event) => (
             <li key={event.id}>
-              <strong>
-                {event.action.replaceAll(".", " ").replaceAll("_", " ")}
-              </strong>
+              <strong>{displayLabel(event.action.replaceAll(".", " "))}</strong>
               {event.actorName ?? "System"}
               <time dateTime={event.occurredAt.toISOString()}>
-                {new Intl.DateTimeFormat("en-IN", {
-                  timeZone: "Asia/Kolkata",
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                }).format(event.occurredAt)}{" "}
-                IST
+                {displayTimestamp(event.occurredAt)}
               </time>
             </li>
           ))}
