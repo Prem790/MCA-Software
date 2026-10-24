@@ -4,6 +4,7 @@ import type { QueryDatabase } from "@/platform/database/types";
 import { appendAudit } from "@/modules/audit";
 import { company, companyDirector, director } from "../schema";
 import type { CompanyRepository, WriteContext } from "../contracts";
+import { lockActiveCompany as activeCompany } from "./work-context";
 
 export function companyRepository(db: QueryDatabase): CompanyRepository {
   const companyScope = (firmId: string, id: string) =>
@@ -28,19 +29,6 @@ export function companyRepository(db: QueryDatabase): CompanyRepository {
       resourceType: "company",
       resourceId: id,
     });
-  // Serializes director edits with archiving the parent company.
-  const activeCompany = async (
-    tx: QueryDatabase,
-    firmId: string,
-    id: string,
-  ) => {
-    const [row] = await tx
-      .select({ id: company.id })
-      .from(company)
-      .where(and(companyScope(firmId, id), isNull(company.archivedAt)))
-      .for("update");
-    return row;
-  };
   return {
     async list(firmId, query) {
       const where = and(

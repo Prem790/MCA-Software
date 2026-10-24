@@ -16,6 +16,15 @@ export async function listAudit(
   firmId: string,
   resourceId: string,
 ) {
+  return listResourceAudit(db, firmId, "company", resourceId);
+}
+
+export async function listResourceAudit(
+  db: QueryDatabase,
+  firmId: string,
+  resourceType: "company" | "task" | "obligation",
+  resourceId: string,
+) {
   return db
     .select({
       id: auditEvent.id,
@@ -29,7 +38,7 @@ export async function listAudit(
     .where(
       and(
         eq(auditEvent.firmId, firmId),
-        eq(auditEvent.resourceType, "company"),
+        eq(auditEvent.resourceType, resourceType),
         eq(auditEvent.resourceId, resourceId),
       ),
     )
