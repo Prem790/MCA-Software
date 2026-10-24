@@ -2,6 +2,7 @@ import { EdgeState } from "@/features/workspace/edge-state";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import {
+  ScrollableTable,
   DataPagination,
   DateLabel,
   EmptyRecords,
@@ -290,12 +291,7 @@ export default async function DashboardPage({
           whose access was removed. Ordered by overdue then unfinished count.
         </p>
         {data.workload.length ? (
-          <div
-            className="table-scroll"
-            role="region"
-            aria-label="Workload table"
-            tabIndex={0}
-          >
+          <ScrollableTable label="Workload table">
             <table className="data-table workspace-data-table">
               <caption className="sr-only">Workload by assignee</caption>
               <thead>
@@ -328,7 +324,7 @@ export default async function DashboardPage({
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollableTable>
         ) : (
           <p>No assigned work yet.</p>
         )}

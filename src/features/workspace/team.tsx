@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import type { TeamMember } from "@/modules/firms/team-contracts";
 import { memberRoleLabels } from "./navigation";
-import { DataBadge, EmptyRecords } from "./data-views";
+import { ScrollableTable, DataBadge, EmptyRecords } from "./data-views";
 import { displayTimestamp } from "./data-display";
 import { useWorkMutation } from "./use-work-mutation";
 import { WorkFeedback } from "./work-feedback";
@@ -158,12 +158,7 @@ export function TeamMembers({
       </EmptyRecords>
     );
   return (
-    <div
-      className="table-scroll"
-      role="region"
-      aria-label="Team members table"
-      tabIndex={0}
-    >
+    <ScrollableTable label="Team members table">
       <table className="data-table workspace-data-table team-table">
         <caption className="sr-only">Active firm members</caption>
         <thead>
@@ -200,7 +195,7 @@ export function TeamMembers({
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollableTable>
   );
 }
 
@@ -336,12 +331,7 @@ export function TeamInvitations({
       </p>
       <WorkFeedback error={mutation.error} notice={mutation.notice} />
       {invitations.length ? (
-        <div
-          className="table-scroll"
-          role="region"
-          aria-label="Invitations table"
-          tabIndex={0}
-        >
+        <ScrollableTable label="Invitations table">
           <table className="data-table workspace-data-table">
             <caption className="sr-only">Recent invitations</caption>
             <thead>
@@ -422,7 +412,7 @@ export function TeamInvitations({
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollableTable>
       ) : (
         <EmptyRecords title="No invitations yet">
           Invitations and delivery status will appear here when your firm sends

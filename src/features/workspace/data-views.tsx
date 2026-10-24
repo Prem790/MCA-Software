@@ -4,6 +4,24 @@ import type { ReactNode } from "react";
 import { isDateOnly } from "@/lib/work-dates";
 import { displayDate, displayLabel, resultSummary } from "./data-display";
 
+export function ScrollableTable({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  // Keep overflowing tables keyboard-scrollable in browsers that do not focus
+  // scroll containers automatically. The rule documents this exception.
+  /* eslint-disable jsx-a11y/no-noninteractive-tabindex -- Labelled table scroll region needs keyboard focus. */
+  return (
+    <div className="table-scroll" role="region" aria-label={label} tabIndex={0}>
+      {children}
+    </div>
+  );
+  /* eslint-enable jsx-a11y/no-noninteractive-tabindex */
+}
+
 export function RecordLink({
   href,
   children,

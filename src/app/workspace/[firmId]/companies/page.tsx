@@ -1,4 +1,5 @@
 import {
+  ScrollableTable,
   DataBadge,
   EmptyRecords,
   RecordLink,
@@ -94,12 +95,7 @@ export default async function CompanyList({
           </span>
         </form>
         {result.items.length ? (
-          <div
-            className="table-scroll"
-            role="region"
-            aria-label="Company records table"
-            tabIndex={0}
-          >
+          <ScrollableTable label="Company records table">
             <table className="data-table workspace-data-table">
               <caption className="sr-only">
                 Saved company records for {actor.firmName}
@@ -135,7 +131,7 @@ export default async function CompanyList({
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollableTable>
         ) : (
           <EmptyRecords
             title={

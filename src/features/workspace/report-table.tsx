@@ -1,4 +1,10 @@
-import { DataBadge, DateLabel, EmptyRecords, RecordLink } from "./data-views";
+import {
+  ScrollableTable,
+  DataBadge,
+  DateLabel,
+  EmptyRecords,
+  RecordLink,
+} from "./data-views";
 import type { ReportKind, ReportRow } from "@/modules/reporting/contracts";
 export function ReportTable({
   firmId,
@@ -16,12 +22,7 @@ export function ReportTable({
   if (!items.length)
     return <EmptyRecords title={emptyTitle}>{emptyDescription}</EmptyRecords>;
   return (
-    <div
-      className="table-scroll"
-      role="region"
-      aria-label="Report records table"
-      tabIndex={0}
-    >
+    <ScrollableTable label="Report records table">
       <table className="data-table workspace-data-table">
         <caption className="sr-only">
           {kind === "tasks" ? "Task report" : "Obligation report"}
@@ -93,6 +94,6 @@ export function ReportTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollableTable>
   );
 }

@@ -1,4 +1,10 @@
-import { DataBadge, DateLabel, EmptyRecords, RecordLink } from "./data-views";
+import {
+  ScrollableTable,
+  DataBadge,
+  DateLabel,
+  EmptyRecords,
+  RecordLink,
+} from "./data-views";
 import { displayLabel } from "./data-display";
 import type { ObligationDetail } from "@/modules/compliance/contracts";
 import type { TaskListItem } from "@/modules/tasks/contracts";
@@ -20,12 +26,7 @@ export function ObligationTable({
       </EmptyRecords>
     );
   return (
-    <div
-      className="table-scroll"
-      role="region"
-      aria-label="Work records table"
-      tabIndex={0}
-    >
+    <ScrollableTable label="Work records table">
       <table className="data-table workspace-data-table">
         <caption className="sr-only">Company obligations</caption>
         <thead>
@@ -73,7 +74,7 @@ export function ObligationTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollableTable>
   );
 }
 export function TaskTable({
@@ -94,12 +95,7 @@ export function TaskTable({
       </EmptyRecords>
     );
   return (
-    <div
-      className="table-scroll"
-      role="region"
-      aria-label="Work records table"
-      tabIndex={0}
-    >
+    <ScrollableTable label="Work records table">
       <table className="data-table workspace-data-table">
         <caption className="sr-only">Company tasks</caption>
         <thead>
@@ -145,6 +141,6 @@ export function TaskTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollableTable>
   );
 }
