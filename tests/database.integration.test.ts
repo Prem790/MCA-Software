@@ -39,7 +39,7 @@ describe("initial PostgreSQL migration", () => {
     const rows = await database.db.execute(
       sql`select count(*)::int as count from information_schema.tables where table_schema = 'public'`,
     );
-    expect(rows.rows[0]?.count).toBe(14);
+    expect(rows.rows[0]?.count).toBe(19);
   });
 
   it("accepts all 20 fictional task fixtures and preserves reruns", async () => {
