@@ -6,6 +6,7 @@ export class ApplicationError extends Error {
       | "NOT_FOUND"
       | "VALIDATION_ERROR"
       | "CONFLICT"
+      | "RATE_LIMITED"
       | "SERVICE_UNAVAILABLE",
     message: string,
   ) {

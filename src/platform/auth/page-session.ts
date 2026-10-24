@@ -3,6 +3,21 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { requireActor, requireSession } from "./session";
 import { ApplicationError } from "@/platform/http/errors";
+import { z } from "zod";
+
+export function pageResourceId(value: string) {
+  if (!z.uuid().safeParse(value).success) notFound();
+  return value;
+}
+export async function pageRecord<T>(read: () => Promise<T>): Promise<T> {
+  try {
+    return await read();
+  } catch (error) {
+    if (error instanceof ApplicationError && error.code === "NOT_FOUND")
+      notFound();
+    throw error;
+  }
+}
 
 export async function pageSession() {
   try {
