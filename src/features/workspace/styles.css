@@ -157,6 +157,58 @@
   align-items: center;
   gap: 12px;
 }
+.work-record-links {
+  margin-bottom: 24px;
+}
+.work-preserve {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.work-check {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.work-check input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+.work-checklist {
+  list-style: none;
+  padding: 0;
+}
+.work-checklist li {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.work-filters {
+  flex-wrap: wrap;
+}
+.workspace-firm-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+  color: #14746b;
+  font-weight: 600;
+}
+.workspace-firm-nav a:hover {
+  text-decoration: underline;
+}
+.workspace-actions select {
+  border: 1px solid var(--border);
+  padding: 8px;
+  border-radius: 6px;
+  background: white;
+}
 .workspace-activity {
   list-style: none;
   padding: 0;
@@ -263,5 +315,173 @@
   }
   .workspace-form .form-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Phase 2E: reuse the workspace surface; broader UI/UX work is a separate phase. */
+.report-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.report-metric {
+  display: grid;
+  gap: 12px;
+  padding: 22px;
+  overflow-wrap: anywhere;
+}
+.report-metric strong {
+  font-size: 28px;
+}
+.report-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.calendar-weekdays,
+.deadline-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.calendar-weekdays {
+  text-align: center;
+}
+.deadline-calendar {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 20px;
+}
+.deadline-calendar a {
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  min-height: 100px;
+  overflow-wrap: anywhere;
+}
+.deadline-calendar span {
+  font-size: 12px;
+}
+.deadline-calendar a[aria-current="date"] {
+  outline: 2px solid #14746b;
+  outline-offset: -2px;
+}
+@media (max-width: 600px) {
+  .deadline-calendar a {
+    padding: 5px;
+    min-height: 90px;
+  }
+  .deadline-calendar span {
+    font-size: 10px;
+  }
+}
+
+/* Connected product navigation: user, firm and role come from authenticated server state. */
+.live-content {
+  max-width: 1520px;
+}
+.live-firm-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.live-firm-content {
+  min-width: 0;
+}
+.live-firm-sidebar {
+  position: sticky;
+  top: 24px;
+  padding: 18px 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.live-firm-summary {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 4px 6px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.live-firm-summary > span {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 36px;
+  background: #e9f2ed;
+  border-radius: 7px;
+  color: #366454;
+  font-size: 12px;
+}
+.live-firm-summary > div {
+  min-width: 0;
+}
+.live-firm-summary strong {
+  display: block;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.live-firm-summary p {
+  font-size: 11px;
+  color: #63756d;
+  text-transform: capitalize;
+  margin-top: 3px;
+}
+.live-firm-sidebar nav {
+  display: grid;
+  gap: 4px;
+}
+.live-firm-sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  padding: 11px 12px;
+  color: #52675e;
+  font-size: 12px;
+}
+.live-firm-sidebar nav a:hover {
+  background: #f2f6f3;
+}
+.live-firm-sidebar nav a[aria-current="page"] {
+  background: #e9f3ee;
+  color: #155c48;
+  font-weight: 600;
+}
+.live-firm-sidebar nav svg {
+  flex-shrink: 0;
+}
+.live-firm-switch {
+  display: block;
+  font-size: 12px;
+  color: #316651;
+  border-top: 1px solid var(--border);
+  padding: 17px 12px 2px;
+  margin-top: 16px;
+}
+@media (max-width: 980px) {
+  .live-firm-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .live-firm-sidebar {
+    position: static;
+  }
+  .live-firm-sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .live-firm-sidebar nav a {
+    padding: 9px 10px;
+  }
+  .live-firm-switch {
+    margin-top: 12px;
+    padding-top: 12px;
   }
 }

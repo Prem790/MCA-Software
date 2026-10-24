@@ -25,7 +25,7 @@ export default async function WorkspaceLayout({
         </Link>
         <nav aria-label="Account navigation">
           <Link href="/workspace">My firms</Link>
-          <Link href="/preview">Fictional preview</Link>
+          <Link href="/">Home</Link>
           {session && (
             <>
               <span>{session.user.name}</span>

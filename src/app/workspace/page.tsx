@@ -6,30 +6,13 @@ export default async function WorkspaceHome() {
   if (readRuntimeConfig().APP_MODE !== "application")
     return (
       <section className="panel workspace-panel">
-        <p className="eyebrow">PHASE 2 · SETUP</p>
-        <h1>Connect your development workspace</h1>
+        <h1>Sign-in is unavailable</h1>
         <p>
-          The working application needs PostgreSQL and an administrator account.
-          The fictional preview is available without either.
+          Your workspace is not ready for sign-in yet. Contact the person who
+          manages your firm’s access.
         </p>
-        <ol className="setup-steps">
-          <li>
-            Configure your development database and auth secret in the local
-            environment.
-          </li>
-          <li>Run the database migrations.</li>
-          <li>
-            Use the account provisioning command to create your firm
-            administrator.
-          </li>
-          <li>Enable application mode and restart the server.</li>
-        </ol>
-        <p>
-          See the repository README for commands. Keep passwords and connection
-          strings out of source control.
-        </p>
-        <Link href="/preview" className="text-link">
-          Open fictional preview
+        <Link href="/" className="text-link">
+          Back to homepage
         </Link>
       </section>
     );
@@ -50,13 +33,13 @@ export default async function WorkspaceHome() {
         <div className="firm-grid">
           {memberships.map((firm) => (
             <Link
-              href={`/workspace/${firm.id}/companies`}
+              href={`/workspace/${firm.id}/dashboard`}
               key={firm.id}
               className="panel workspace-firm-card"
             >
               <span className="outline-badge">{firm.role}</span>
               <h2>{firm.name}</h2>
-              <p>Open company records →</p>
+              <p>Open firm dashboard →</p>
             </Link>
           ))}
         </div>

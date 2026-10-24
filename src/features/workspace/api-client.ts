@@ -23,3 +23,53 @@ export async function workspaceRequest<T>(
   }
   return result.data as T;
 }
+
+export async function uploadWorkspaceDocument(
+  url: string,
+  file: File,
+): Promise<void> {
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "same-origin",
+    cache: "no-store",
+    headers: { "Content-Type": "application/octet-stream" },
+    body: file,
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(
+      response.status === 401
+        ? "Your session expired. Sign in again."
+        : (body?.error?.message ??
+            "Upload failed. Refresh the document list before retrying."),
+    );
+  }
+}
+
+export async function downloadWorkspaceReport(
+  url: string,
+  filename: string,
+): Promise<void> {
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const result = await response.json().catch(() => null);
+    throw new Error(
+      response.status === 401
+        ? "Your session expired. Sign in again."
+        : (result?.error?.message ??
+            "Report download failed. Try again later."),
+    );
+  }
+  const objectUrl = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+}
