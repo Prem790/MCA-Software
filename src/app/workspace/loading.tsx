@@ -1,3 +1,8 @@
+import { EdgeState } from "@/features/workspace/edge-state";
 export default function Loading() {
-  return <p role="status">Loading your workspace…</p>;
+  return (
+    <EdgeState title="Loading your workspace" loading>
+      <span role="status">Getting the latest saved records. Please wait…</span>
+    </EdgeState>
+  );
 }

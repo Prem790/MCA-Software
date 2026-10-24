@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
-import { SignOut } from "@/features/identity/sign-out";
+import { AccountNavigation } from "@/features/workspace/account-navigation";
 import { readRuntimeConfig } from "@/platform/configuration/env";
 import { pageSession } from "@/platform/auth/page-session";
 export const dynamic = "force-dynamic";
@@ -23,16 +23,7 @@ export default async function WorkspaceLayout({
           </span>
           MCA Software
         </Link>
-        <nav aria-label="Account navigation">
-          <Link href="/workspace">My firms</Link>
-          <Link href="/">Home</Link>
-          {session && (
-            <>
-              <span>{session.user.name}</span>
-              <SignOut />
-            </>
-          )}
-        </nav>
+        <AccountNavigation userName={session?.user.name} />
       </header>
       <main id="workspace-content" className="live-content" tabIndex={-1}>
         {children}
