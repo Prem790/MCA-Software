@@ -1,5 +1,6 @@
 import { ApplicationError } from "@/platform/http/errors";
 import type { Actor } from "../domain/access";
+import { invitationStatus } from "../domain/team-policy";
 import {
   acceptInvitationInput,
   invitationInput,
@@ -28,8 +29,19 @@ export function teamService(
     return { ...actor, requestId };
   };
   return {
-    list(actor: Actor, query: unknown) {
-      return repository.list(admin(actor, "read"), teamQuery.parse(query).page);
+    async list(actor: Actor, query: unknown) {
+      const data = await repository.list(
+        admin(actor, "read"),
+        teamQuery.parse(query).page,
+      );
+      const now = Date.now();
+      return {
+        ...data,
+        invitations: data.invitations.map((invitation) => ({
+          ...invitation,
+          status: invitationStatus(invitation, now),
+        })),
+      };
     },
     async invite(actor: Actor, input: unknown, requestId: string) {
       const context = admin(actor, requestId);

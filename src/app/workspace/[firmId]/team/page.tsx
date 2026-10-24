@@ -42,7 +42,6 @@ export default async function TeamPage({
       dateStyle: "medium",
       timeStyle: "short",
     }).format(value);
-  const now = Date.now();
   return (
     <>
       <div className="page-heading">
@@ -85,13 +84,7 @@ export default async function TeamPage({
           deliveryStatus: invite.deliveryStatus,
           expiresAt: format(invite.expiresAt),
           canCancel: !invite.acceptedAt && !invite.revokedAt,
-          status: invite.acceptedAt
-            ? "Accepted"
-            : invite.revokedAt
-              ? "Cancelled"
-              : invite.expiresAt.getTime() <= now
-                ? "Expired"
-                : "Pending",
+          status: invite.status,
         }))}
       />
       <section className="panel workspace-panel">
