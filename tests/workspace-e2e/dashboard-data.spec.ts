@@ -1,5 +1,5 @@
 import { signInToFirm } from "../support/workspace-sign-in";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../support/workspace-test";
 
 test("dashboard drill-down retains company scope and renders saved task labels and dates", async ({
   page,

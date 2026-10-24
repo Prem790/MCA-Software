@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../support/workspace-test";
 
 test("password visibility preserves input and a rejected sign-in restores retry controls", async ({
   page,

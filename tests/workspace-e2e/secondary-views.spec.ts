@@ -1,5 +1,5 @@
 import { signInToFirm } from "../support/workspace-sign-in";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../support/workspace-test";
 
 test("calendar month/day links preserve company visibility and expose the selected-day agenda", async ({
   page,

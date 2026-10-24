@@ -1,5 +1,5 @@
 import { signInToFirm } from "../support/workspace-sign-in";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../support/workspace-test";
 
 test("company form preserves failed entries and stays busy through create navigation", async ({
   page,

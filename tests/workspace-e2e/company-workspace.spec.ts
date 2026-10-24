@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../support/workspace-test";
 import AxeBuilder from "@axe-core/playwright";
 
 test("administrator persists company/director changes while staff remain read-only", async ({

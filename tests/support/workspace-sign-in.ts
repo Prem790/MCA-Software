@@ -18,9 +18,11 @@ export async function signInToFirm(page: Page, email = "admin@example.test") {
     signingIn,
     page.getByRole("button", { name: "Sign in", exact: true }).click(),
   ]);
+  const headers = response.headers();
+  const retryAfter = headers["retry-after"] ?? headers["x-retry-after"];
   expect(
     response.status(),
-    `Workspace sign-in must succeed before selecting a firm (HTTP ${response.status()}; retry-after ${response.headers()["retry-after"] ?? "not supplied"}).`,
+    `Workspace sign-in must succeed before selecting a firm (HTTP ${response.status()}; retry-after ${retryAfter ?? "not supplied"}).`,
   ).toBe(200);
   await expect(page).toHaveURL(/\/workspace$/, { timeout: 15000 });
   await expect(

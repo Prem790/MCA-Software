@@ -1,4 +1,4 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Page } from "../support/workspace-test";
 
 async function signIn(page: Page, email: string) {
   await page.goto("/login");
