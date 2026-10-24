@@ -10,6 +10,7 @@ import {
   company,
   director,
   companyDirector,
+  invitation,
 } from "@/platform/database/schema";
 import { GET as listFirms } from "@/app/api/firms/route";
 import {
@@ -29,6 +30,10 @@ import {
 } from "@/app/api/firms/[firmId]/companies/[companyId]/directors/[associationId]/route";
 import { GET as activity } from "@/app/api/firms/[firmId]/companies/[companyId]/activity/route";
 import { createTestDatabase } from "./support/database";
+import { GET as listTeam } from "@/app/api/firms/[firmId]/team/route";
+import { PATCH as changeRole } from "@/app/api/firms/[firmId]/team/[membershipId]/route";
+import { POST as inspectInvitation } from "@/app/api/invitations/inspect/route";
+import { invitationTokens } from "@/modules/firms";
 
 let database: Awaited<ReturnType<typeof createTestDatabase>>;
 vi.mock("@/platform/database/client", () => ({
@@ -138,6 +143,112 @@ afterAll(async () => {
 });
 
 describe("authenticated company workspace", () => {
+  it("protects public invitation inspection with origin, body and shared token limits", async () => {
+    const token = invitationTokens.create();
+    const [admin] = await database.db
+      .select()
+      .from(user)
+      .where(eq(user.email, "admin@example.test"));
+    await database.db.insert(invitation).values({
+      firmId,
+      email: "invited-http@example.test",
+      role: "staff",
+      tokenHash: token.hash,
+      invitedBy: admin!.id,
+      expiresAt: new Date(Date.now() + 60000),
+    });
+    expect(
+      (
+        await inspectInvitation(
+          request(
+            "POST",
+            "anonymous",
+            { token: token.raw },
+            { Origin: "https://attacker.example.test" },
+          ),
+        )
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await inspectInvitation(
+          request("POST", "anonymous", { token: "invalid" }),
+        )
+      ).status,
+    ).toBe(400);
+    for (let index = 0; index < 10; index++) {
+      const response = await inspectInvitation(
+        request("POST", "anonymous", { token: token.raw }),
+      );
+      expect(response.status).toBe(200);
+      expect(await data(response)).toMatchObject({
+        requiresSignIn: false,
+        email: "invited-http@example.test",
+      });
+    }
+    expect(
+      (
+        await inspectInvitation(
+          request("POST", "anonymous", { token: token.raw }),
+        )
+      ).status,
+    ).toBe(429);
+  });
+  it("restricts team APIs to current administrators and rejects forged roles and cross-origin changes", async () => {
+    expect((await listTeam(request(), context())).status).toBe(200);
+    expect((await listTeam(request("GET", "manager"), context())).status).toBe(
+      403,
+    );
+    expect((await listTeam(request("GET", "staff"), context())).status).toBe(
+      403,
+    );
+    expect(
+      (await listTeam(request("GET", "anonymous"), context())).status,
+    ).toBe(401);
+    expect(
+      (await listTeam(request(), context(undefined, otherFirmId))).status,
+    ).toBe(404);
+    const [admin] = await database.db
+      .select()
+      .from(user)
+      .where(eq(user.email, "admin@example.test"));
+    const [member] = await database.db
+      .select()
+      .from(membership)
+      .where(eq(membership.userId, admin!.id));
+    const teamContext = {
+      params: Promise.resolve({ firmId, membershipId: member!.id }),
+    };
+    expect(
+      (
+        await changeRole(
+          request("PATCH", "admin", { role: "owner" }),
+          teamContext,
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await changeRole(
+          request(
+            "PATCH",
+            "admin",
+            { role: "staff" },
+            { Origin: "https://attacker.example.test" },
+          ),
+          teamContext,
+        )
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await changeRole(
+          request("PATCH", "admin", { role: "staff" }),
+          teamContext,
+        )
+      ).status,
+    ).toBe(409);
+  });
   it("requires a real session and lists only current memberships", async () => {
     expect(
       (await listCompanies(request("GET", "anonymous"), context())).status,

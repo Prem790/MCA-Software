@@ -5,7 +5,11 @@ test("administrator persists company/director changes while staff remain read-on
   page,
   browser,
 }) => {
-  await page.goto("/workspace");
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Your practice.",
+  );
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(
     page.getByRole("button", { name: "Sign in", exact: true }),
@@ -21,6 +25,16 @@ test("administrator persists company/director changes while staff remain read-on
     page.getByRole("heading", { name: "Choose your firm" }),
   ).toBeVisible();
   await page.getByRole("link", { name: /Workspace Browser Test Firm/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "Dashboard", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Fictional preview", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("navigation", { name: "Firm navigation" })
+    .getByRole("link", { name: "Companies", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "No companies yet" }),
   ).toBeVisible();
@@ -171,7 +185,7 @@ test("administrator persists company/director changes while staff remain read-on
     page.getByRole("heading", { name: "Alex Test Person", exact: true }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/$/);
   await page.goto(companyUrl);
   await expect(page).toHaveURL(/\/login$/);
 });

@@ -52,6 +52,45 @@ export default async function CompanyDetail({
           This company is archived. Restore it before making changes.
         </p>
       )}
+      <nav
+        className="workspace-actions work-record-links"
+        aria-label="Company work"
+      >
+        <Link
+          className="text-link"
+          href={`/workspace/${firmId}/obligations?companyId=${company.id}&archived=all`}
+        >
+          Company obligations
+        </Link>
+        <Link
+          className="text-link"
+          href={`/workspace/${firmId}/tasks?companyId=${company.id}&archived=all`}
+        >
+          Company tasks
+        </Link>
+        <Link
+          className="text-link"
+          href={`/workspace/${firmId}/documents?companyId=${companyId}`}
+        >
+          Company documents
+        </Link>
+        {writable && (
+          <>
+            <Link
+              className="text-link"
+              href={`/workspace/${firmId}/obligations/new?companyId=${company.id}`}
+            >
+              New obligation
+            </Link>
+            <Link
+              className="text-link"
+              href={`/workspace/${firmId}/tasks/new?companyId=${company.id}`}
+            >
+              New task
+            </Link>
+          </>
+        )}
+      </nav>
       <div className="workspace-detail-grid">
         <section className="panel workspace-panel">
           <h2>Company information</h2>

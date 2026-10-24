@@ -2,6 +2,7 @@ import { getAuth } from "@/platform/auth/server";
 import { readRuntimeConfig } from "@/platform/configuration/env";
 import { requestId, serviceUnavailable } from "@/platform/http/responses";
 import { logServiceFailure } from "@/platform/observability/logger";
+import { requireEmailConfig } from "@/platform/email/configuration";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +12,8 @@ async function handle(request: Request) {
   try {
     if (readRuntimeConfig().APP_MODE !== "application")
       return serviceUnavailable(id);
+    if (new URL(request.url).pathname.endsWith("/request-password-reset"))
+      requireEmailConfig();
     const response = await getAuth().handler(request);
     if (response.status >= 500) {
       logServiceFailure("authentication.provider_failed", id);

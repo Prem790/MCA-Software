@@ -11,7 +11,7 @@ records, obligations, assignments, documents, and reviews in one workspace.
 
 ## Core Features
 
-Phase 2 — first functional increment implemented locally:
+Phase 2 — company workspace and team-onboarding increments implemented:
 
 - Operator-provisioned administrator, manager and staff accounts; real sign-in/sign-out.
 - Firm chooser and server-side membership checks on every company request.
@@ -20,64 +20,99 @@ Phase 2 — first functional increment implemented locally:
 - Admin/manager writes and staff read access, enforced by the API.
 - Company audit history saved transactionally with each change.
 
-The full functional MVP is still in progress. No hosted evaluation URL is available yet.
+Phase 2B adds:
 
-Implemented interface preview:
+- Admin-only team management, role changes, access revocation and last-admin protection.
+- Email invitations with 72-hour expiry, single-use hashed tokens and cancellation.
+- Invite-only account creation; existing accounts join after signing in with the invited email.
+- Password recovery with one-hour reset links and revocation of previous sessions.
+- Resend email adapter with explicit opt-in, timeout and idempotency keys.
+- Database-backed authentication throttling shared across Vercel instances.
 
-- Responsive workspace with dashboard, company list/details, and director/document sections.
-- Searchable company, assignment, compliance and document lists with empty states.
-- Monthly calendar with navigation and links to assignments on a selected date.
-- Task detail with local checklist, review simulation and sample comments.
-- Downloadable fictional text files; firm, team and notification settings layouts.
-- Sign-in layout and preview guide; disabled actions explain their future behavior.
-- Five fictional companies and 20 assignments using a fixed 22 October 2026 snapshot.
+The owner has deployed the first increment to [MCA Software](https://mca-software.vercel.app).
+Phase 2C adds:
 
-Preview data is public and fixed. Local interactions reset on reload/navigation;
-those preview interactions do not use operational login, persistence, uploads or email.
-The calendar uses illustrative dates, with no legal-deadline calculation.
+- Company-wise obligations with reusable instruction templates and confirmed deadlines.
+- Monthly/quarterly/annual next-occurrence proposals, confirmed one at a time.
+- Persistent task creation, assignment, priorities, instructions and date/status filters.
+- Assigned-staff progress updates, checklist checks and comments; manager-controlled scope.
+- Completion notes, completed-task protection, reopening and transactional activity history.
+- Version checks for stale edits, active-member assignment and archived-company protection.
+
+Phase 2D adds:
+
+- Private company/task uploads and authenticated, audited downloads (PDF/PNG/JPEG/TXT, up to 3 MiB).
+- Independent review submissions, correction requests, resubmissions and approvals.
+- Retained task/checklist/document snapshots and protection against completion without approval.
+- Optional private Vercel Blob adapter, upload quotas and explicit partial-failure recovery.
+
+Phase 2E adds:
+
+- Live dashboard counts, upcoming work, pending own reviews and assignee workload.
+- Month/day calendar with task dates and confirmed obligation dates, linking to real records.
+- Task/obligation reports with due ranges and existing work filters.
+- Admin/manager CSV exports with firm checks, spreadsheet text escaping, audit history and limits.
+- Refresh-based views using existing data; no simulated dashboard values.
+
+Phases 2B/2C/2D need owner-run migrations and verification before deployment. Resend
+configuration is deferred; company and work management operate without email.
+The full functional MVP remains in progress.
+
+Public homepage and connected product entry:
+
+- Original public homepage explains the audience, implemented features, workflow and account access.
+- Sign in → choose a firm → live dashboard; shared navigation uses the actual firm and role.
+- Legacy `/preview` bookmarks enter the real workspace; fictional screens and sample downloads are retired.
+- New firms start empty. Counts, calendar entries and reports use saved records.
+- The homepage stays public in both runtime modes without querying tenant data.
 
 Implemented foundation:
 
 - Next.js/React/TypeScript application shell with shared Tailwind/shadcn styling.
 - Strict runtime configuration and separate liveness/readiness endpoints.
-- Better Auth + Drizzle integration; public sign-up disabled, no onboarding UI yet.
-- Versioned PostgreSQL schema with 14 tables and tenant/company integrity links.
+- Better Auth + Drizzle integration; public sign-up disabled, invitation-only onboarding.
+- Versioned PostgreSQL schema with 19 tables and tenant/company integrity links.
 - Opt-in, transactional seed for five fictional companies and 20 tasks.
 - SQL migration/constraint/auth tests, browser workflow/accessibility tests and architecture checks.
 - CI, a non-root standalone container recipe, and operational documentation.
 
-Remaining Phase 2: invitations/reset and team administration; obligation templates,
-confirmed dates and recurrence; persistent assignments/checklists/comments; private
-documents; reviews, reminders and exports; a hosted evaluation environment. Later phases add a client portal, document generation,
-billing, selected MCA integrations and evaluated AI. See [delivery phases](docs/roadmap.md).
+Next: owner verification of the public homepage and connected entry, small commits/push/deploy, a separate UI/UX improvement pass, then client workflow verification
+and handover (2F). Phase 2E awaits owner-run verification. Email
+invitations/recovery/reminders require later sender configuration. Later phases add a client portal, document generation,
+and additional reporting, prioritized with the client. AI and advanced government
+integrations are outside the current MVP scope. See [delivery phases](docs/roadmap.md).
 
 ## Architecture
 
 A root-level **modular monolith**, not separate frontend/API services. Next routes
-handle HTTP/UI; company use cases own company operations; other workflows are planned. Domain code stays
+handle HTTP/UI; company, team, compliance and task use cases own their workflows. Domain code stays
 independent of vendors. The initial hosting target is Vercel with Neon PostgreSQL; DigitalOcean is a
 later option.
 
 ```mermaid
 flowchart TD
     Browser[Browser] --> Web[Next.js on Vercel / UI and HTTP routes]
-    Web --> Preview[Public preview / fixed fictional records]
+    Web --> Homepage[Public homepage / product explanation]
     Web --> Auth[Better Auth: application mode only]
-    Web --> Modules[Company use cases / firm and audit modules]
+    Web --> Modules[Company, team, compliance and task use cases]
     Auth --> Database[(Neon PostgreSQL / Drizzle)]
     Modules --> Database
-    Modules -. Phase 2 .-> Storage[Private object storage: planned]
+    Auth --> Email[Resend: optional account email]
+    Modules --> Email
+    Modules --> Storage[Private Vercel Blob: optional evidence storage]
     Worker[Phase 2 scheduled jobs: design pending] -.-> Database
-    Worker -.-> Email[Resend]
+    Worker -.-> Email
 ```
 
 ```text
 src/
   app/                 # Pages and thin HTTP boundaries
   components/ui/       # Shared UI primitives
-  features/preview/    # Isolated sample screens, selectors and local interactions
-  features/identity/   # Sign-in/sign-out clients
-  features/workspace/  # Authenticated company forms and API client
+  features/marketing/  # Public product explanation; no tenant data
+  features/preview/    # Unrouted design references and test fixtures
+  styles/              # Shared brand, components and forms
+  features/identity/   # Sign-in, invitations and password recovery
+  features/workspace/  # Company/team/work forms, tables and API client
   demo/                # Shared deterministic fictional fixture factory
   modules/             # Identity, firms, companies, compliance, tasks, documents, audit
   platform/            # Configuration, auth, database, logging and HTTP helpers
@@ -97,7 +132,7 @@ See [architecture and boundaries](docs/architecture/overview.md),
 
 Prerequisites: **Node 24.x >=24.11**, npm, and Git. Docker is optional for local
 PostgreSQL and required only to build/run the provided deployment containers.
-No paid account is needed for the preview, migration tests or auth integration tests.
+No paid account is needed for the public homepage or embedded database tests.
 
 From your repository checkout:
 
@@ -108,10 +143,9 @@ cp .env.example .env
 npm run dev
 ```
 
-Open http://localhost:3000/preview. The root redirects there. The default
-`APP_MODE=foundation` serves the fictional preview;
-auth is disabled and readiness deliberately returns 503. This is not a database
-failure. Credentials are needed only for application mode.
+Open http://localhost:3000/. The public homepage is available in either mode.
+The default `APP_MODE=foundation` disables auth and shows an unavailable sign-in
+state; readiness deliberately returns 503. Credentials are needed for application mode.
 
 To enable a disposable development database:
 
@@ -119,8 +153,8 @@ To enable a disposable development database:
    retain TLS parameters. Optionally set a direct `DATABASE_MIGRATION_URL`.
 2. Generate a secret with `openssl rand -base64 48` and set `BETTER_AUTH_SECRET`.
 3. Run `npm run db:migrate`. Provision the administrator as described below.
-4. Set `APP_MODE=application`, restart the server, and open `/login`. The root now
-   routes to `/workspace`. Select your firm to create and manage company records.
+4. Set `APP_MODE=application`, restart the server, and choose **Sign in** on `/`.
+   Select your firm to open its live dashboard and navigate to company records.
 5. For fictional data, explicitly set `SEED_DATABASE_URL` and
    `ALLOW_DEMO_SEED=true`, then run `npm run db:seed`. No passwords or usable
    login accounts are seeded. Never seed a production/client database.
@@ -134,6 +168,33 @@ admin membership and audit event in one transaction; public signup stays disable
 For another account in an existing firm, replace `PROVISION_FIRM_NAME` with
 `PROVISION_FIRM_ID` and choose `PROVISION_ROLE=admin|manager|staff`.
 No real account or Neon project is created automatically.
+
+For team onboarding, apply migration `0001_team_onboarding` using `npm run db:migrate`
+before running the new app version. Open **Team and access** within your firm.
+Email starts disabled: existing login and company records continue to work. To
+activate invitations and password recovery, verify a sender domain in Resend and
+privately set `EMAIL_DELIVERY=resend`, `RESEND_API_KEY` and `EMAIL_FROM` (a bare
+sender address on that domain). Configure these separately in local and Vercel
+Production environments; restart/redeploy after changing them. Never commit API keys.
+See [Phase 2B setup and verification](docs/runbooks/team-onboarding.md).
+
+For Phase 2C, run `npm run db:migrate` to apply all pending migrations before
+restarting/deploying. Open **Obligations** or **Tasks** in the firm navigation.
+Create a template or custom obligation, confirm its date, then create and assign
+its task. Staff update only assigned work; admins/managers control scope. Keep
+`EMAIL_DELIVERY=disabled` while email is deferred. No new API key or dependency is
+needed. See [Phase 2C setup and verification](docs/runbooks/work-management.md).
+
+For Phase 2D, run `npm ci` and apply pending migrations before restarting.
+Connect a **private** Vercel Blob store and privately set `DOCUMENT_STORAGE=vercel-blob`
+and `BLOB_READ_WRITE_TOKEN` to enable uploads. Without storage, use written review
+summaries. A second admin/manager account is required for independent review.
+See [documents/review setup and owner checks](docs/runbooks/documents-and-review.md).
+
+For Phase 2E, no new setup or migration is required. Choose a firm to open its live
+Dashboard; use Calendar or Reports in the firm navigation. Staff can view firm records;
+admins/managers can export up to 1,000 filtered rows per CSV. Email reminders remain
+planned. See [dashboard/reporting owner checks](docs/runbooks/dashboard-and-reporting.md).
 
 See [local development](docs/runbooks/development.md) for local PostgreSQL,
 environment details, seed safeguards and migration review.
@@ -192,16 +253,23 @@ shared Prettier settings. Architecture rules live in
 Secret-scanning rules live in `config/gitleaks.toml`; CI passes that path
 explicitly. Local Gitleaks scans should also use `--config config/gitleaks.toml`.
 
+Dependency maintenance: the `@vercel/cli-config` override reuses the project's
+Zod 4.6.7 instead of its vulnerable pinned 4.1.11 dependency. This addresses
+[GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5), whose patched
+versions start at 4.6.6, while retaining the private Blob SDK. The repository
+maintainer should remove this override when the upstream dependency chain resolves
+to a patched Zod version without it, after checking document upload/download behavior.
+
 Owner validation workflow: the coding agent makes changes and reviews them
 statically, then hands over test/check commands and manual UI steps. Agent-run
 checks require an explicit request. Existing CI checks remain configured.
 
 ## Core API / Usage
 
-In foundation mode, preview walkthrough: open `/login`, choose **Open sample workspace**, open a
-company, explore its assignments, check the remaining checklist items, simulate
-a review request and add a sample comment. Reload to restore the original data.
-Search and calendar filters are URL-based and can be bookmarked.
+Public entry walkthrough: open `/`, explore features and workflow, then choose
+**Sign in**. In application mode, authenticate and choose your firm to open the live
+dashboard. In foundation mode, sign-in explains that access is unavailable.
+See [public entry owner checks](docs/runbooks/public-product-entry.md).
 
 ```bash
 curl -i http://localhost:3000/api/health
@@ -221,8 +289,16 @@ appropriate role. Read [HTTP contracts](docs/api/contracts.md).
 Application walkthrough: sign in, select your firm, add a company, edit its
 address, add/edit a director, reload to verify persistence, and inspect activity.
 Archiving preserves the records; restore before editing again. Staff can view
-these records and cannot change them.
+company records and cannot change them. For tasks, assigned staff may update progress,
+check existing checklist items and comment. Managers/admins create and assign work.
 
-Phase 1 is an interface preview; the full Phase 2 MVP remains in progress.
+Work walkthrough: create a confirmed obligation, create its task, add checklist
+items, assign an active member, record progress/comments, finish the checklist,
+submit evidence to another admin/manager for review, address corrections, obtain approval, then provide a completion note and complete. Only an admin/manager can reopen it; reopening requires fresh approval before completion.
+Monthly/quarterly/annual recurrence proposes the next date from the original anchor;
+a user must confirm each occurrence. This is scheduling, not legal-date verification.
+Changing an obligation deadline never silently reschedules its existing tasks.
+
+Phase 1 prototype routes have been retired; the full Phase 2 MVP remains in progress.
 REA is optional investigation tooling, not a runtime dependency. Reference
 assumptions and unknowns are recorded in [research boundaries](docs/research/reference-boundaries.md).

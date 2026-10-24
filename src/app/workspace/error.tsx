@@ -5,8 +5,8 @@ export default function ErrorPage({ reset }: { reset: () => void }) {
     <section className="panel workspace-panel">
       <h1>The workspace could not load</h1>
       <p>
-        Check that the development database is reachable and migrations have
-        been applied, then try again.
+        Please try again. If the problem continues, contact your firm
+        administrator.
       </p>
       <Button onClick={reset}>Try again</Button>
     </section>

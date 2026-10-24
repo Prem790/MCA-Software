@@ -13,6 +13,7 @@ const statusCodes = {
   NOT_FOUND: 404,
   VALIDATION_ERROR: 400,
   CONFLICT: 409,
+  RATE_LIMITED: 429,
   SERVICE_UNAVAILABLE: 503,
 };
 export async function businessResponse(
@@ -22,7 +23,13 @@ export async function businessResponse(
   const id = requestId();
   const headers = { "Cache-Control": "no-store", "X-Request-Id": id };
   try {
-    return Response.json({ data: await work(id) }, { status, headers });
+    const result = await work(id);
+    if (result instanceof Response) {
+      result.headers.set("Cache-Control", "private, no-store");
+      result.headers.set("X-Request-Id", id);
+      return result;
+    }
+    return Response.json({ data: result }, { status, headers });
   } catch (error) {
     let failure =
       error instanceof ApplicationError
@@ -70,23 +77,22 @@ export function firmEndpoint(
 ) {
   return businessResponse(async (id) => {
     if (!["GET", "HEAD"].includes(request.method)) {
-      if (
-        request.headers.get("origin") !==
-        new URL(readRuntimeConfig().APP_URL).origin
-      )
-        throw new ApplicationError(
-          "FORBIDDEN",
-          "This request origin is not allowed.",
-        );
-      if (request.headers.get("sec-fetch-site") === "cross-site")
-        throw new ApplicationError(
-          "FORBIDDEN",
-          "Cross-site changes are not allowed.",
-        );
+      assertWriteOrigin(request);
     }
     const actor = await requireActor(request.headers, firmId);
     return work(actor, id);
   }, status);
+}
+export function assertWriteOrigin(request: Request) {
+  if (
+    request.headers.get("origin") !==
+      new URL(readRuntimeConfig().APP_URL).origin ||
+    request.headers.get("sec-fetch-site") === "cross-site"
+  )
+    throw new ApplicationError(
+      "FORBIDDEN",
+      "This request origin is not allowed.",
+    );
 }
 export async function jsonBody(request: Request) {
   if (!request.headers.get("content-type")?.startsWith("application/json"))

@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "@/styles/brand.css";
+import "@/styles/components.css";
+import "@/styles/forms.css";
+import "@/features/marketing/styles.css";
 import "@/features/workspace/styles.css";
-import "@/features/preview/styles/shell.css";
-import "@/features/preview/styles/components.css";
-import "@/features/preview/styles/forms.css";
-import "@/features/preview/styles/dashboard.css";
-import "@/features/preview/styles/detail.css";
-import "@/features/preview/styles/calendar-documents.css";
-import "@/features/preview/styles/settings-guide.css";
-import "@/features/preview/styles/login.css";
-import "@/features/preview/styles/responsive.css";
 
 export const metadata: Metadata = {
   title: "MCA Software",

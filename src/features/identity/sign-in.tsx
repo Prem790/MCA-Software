@@ -77,11 +77,15 @@ export function SignIn() {
           </Button>
         </form>
         <p className="workspace-note">
-          Account invitations and password recovery are coming in a later Phase
-          2 increment. Contact your administrator for account setup.
+          Need access? Ask your firm administrator to set up your account.
         </p>
-        <Link href="/preview" className="text-link">
-          Explore the fictional preview
+        <p className="workspace-note">
+          <Link href="/forgot-password" className="text-link">
+            Forgot your password?
+          </Link>
+        </p>
+        <Link href="/" className="text-link">
+          Back to homepage
         </Link>
       </div>
     </main>
