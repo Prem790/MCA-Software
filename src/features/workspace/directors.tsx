@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import type { DirectorRecord } from "@/modules/companies";
@@ -14,7 +14,9 @@ function DirectorForm({
   director?: DirectorRecord;
   onSaved?: () => void;
 }) {
-  const [pending, setPending] = useState(false);
+  const [saving, setPending] = useState(false);
+  const [refreshing, startTransition] = useTransition();
+  const pending = saving || refreshing;
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const router = useRouter();
@@ -33,7 +35,7 @@ function DirectorForm({
       setNotice(director ? "Director saved." : "Director added.");
       if (!director) form.reset();
       onSaved?.();
-      router.refresh();
+      startTransition(() => router.refresh());
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Could not save director.",
@@ -45,41 +47,45 @@ function DirectorForm({
   return (
     <form
       onSubmit={submit}
-      className="workspace-form"
+      className="workspace-form workflow-form"
+      aria-busy={pending}
       aria-label={director ? `Edit director ${director.name}` : "Add director"}
     >
-      <div className="form-grid">
-        <label className="field-label">
-          Director name
-          <input
-            name="name"
-            defaultValue={director?.name ?? ""}
-            required
-            minLength={2}
-            maxLength={200}
-          />
-        </label>
-        <label className="field-label">
-          DIN (optional)
-          <input
-            name="din"
-            defaultValue={director?.din ?? ""}
-            pattern="[0-9]{8}"
-            title="Eight digits"
-            maxLength={8}
-          />
-        </label>
-        <label className="field-label">
-          Designation
-          <input
-            name="designation"
-            defaultValue={director?.designation ?? "Director"}
-            required
-            minLength={2}
-            maxLength={120}
-          />
-        </label>
-      </div>
+      <fieldset className="workflow-fields" disabled={pending}>
+        <legend>Director details</legend>
+        <div className="form-grid">
+          <label className="field-label">
+            Director name
+            <input
+              name="name"
+              defaultValue={director?.name ?? ""}
+              required
+              minLength={2}
+              maxLength={200}
+            />
+          </label>
+          <label className="field-label">
+            DIN (optional)
+            <input
+              name="din"
+              defaultValue={director?.din ?? ""}
+              pattern="[0-9]{8}"
+              title="Eight digits"
+              maxLength={8}
+            />
+          </label>
+          <label className="field-label">
+            Designation
+            <input
+              name="designation"
+              defaultValue={director?.designation ?? "Director"}
+              required
+              minLength={2}
+              maxLength={120}
+            />
+          </label>
+        </div>
+      </fieldset>
       {error && (
         <p role="alert" className="form-error">
           {error}
@@ -107,7 +113,9 @@ function DirectorRow({
 }) {
   const [editing, setEditing] = useState(false);
   const [confirm, setConfirm] = useState(false);
-  const [pending, setPending] = useState(false);
+  const [saving, setPending] = useState(false);
+  const [refreshing, startTransition] = useTransition();
+  const pending = saving || refreshing;
   const [error, setError] = useState("");
   const router = useRouter();
   return (
@@ -124,6 +132,8 @@ function DirectorRow({
             <Button
               size="sm"
               variant="outline"
+              disabled={pending}
+              aria-expanded={editing}
               onClick={() => setEditing(!editing)}
             >
               {editing ? "Close edit" : `Edit ${director.name}`}
@@ -131,6 +141,8 @@ function DirectorRow({
             <Button
               size="sm"
               variant="outline"
+              disabled={pending}
+              aria-expanded={confirm}
               onClick={() => setConfirm(!confirm)}
             >
               Remove {director.name}
@@ -146,7 +158,7 @@ function DirectorRow({
         />
       )}
       {confirm && (
-        <div className="workspace-actions">
+        <div className="workspace-actions workflow-confirmation">
           <span>
             Remove this company association? The director record is retained.
           </span>
@@ -159,7 +171,7 @@ function DirectorRow({
               setError("");
               try {
                 await workspaceRequest(endpoint, "DELETE");
-                router.refresh();
+                startTransition(() => router.refresh());
               } catch (error) {
                 setError(
                   error instanceof Error

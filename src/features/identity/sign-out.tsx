@@ -1,4 +1,5 @@
 "use client";
+import { LoaderCircle, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ export function SignOut() {
   const [error, setError] = useState("");
   const router = useRouter();
   return (
-    <div>
+    <div className="workspace-sign-out">
       <Button
         variant="outline"
         size="sm"
@@ -27,6 +28,11 @@ export function SignOut() {
           }
         }}
       >
+        {pending ? (
+          <LoaderCircle size={16} className="ui-spinner" aria-hidden="true" />
+        ) : (
+          <LogOut size={16} aria-hidden="true" />
+        )}
         {pending ? "Signing out…" : "Sign out"}
       </Button>
       {error && (

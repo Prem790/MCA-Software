@@ -1,13 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f9fa;
-  --foreground: #24333b;
-  --primary: #14746b;
+  --background: #f7f9f4;
+  --foreground: #243e35;
+  --surface: #ffffff;
+  --text-muted: #526454;
+  --control-border: #b6c5b8;
+  --control-radius: 8px;
+  --primary: #173e36;
   --primary-foreground: #ffffff;
-  --muted: #eaf0f3;
-  --border: #d9e2e7;
-  --ring: #0f766e;
+  --muted: #edf3e8;
+  --border: #dce5d9;
+  --ring: #256454;
 }
 
 @theme inline {
@@ -66,4 +70,18 @@ textarea {
 }
 button:disabled {
   cursor: not-allowed;
+}
+.ui-spinner {
+  flex-shrink: 0;
+  animation: ui-spin 0.85s linear infinite;
+}
+@keyframes ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-spinner {
+    animation: none;
+  }
 }

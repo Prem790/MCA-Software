@@ -1,3 +1,9 @@
+import { DataBadge, DateLabel } from "@/features/workspace/data-views";
+import { EdgeState } from "@/features/workspace/edge-state";
+import {
+  displayTimestamp,
+  displayLabel,
+} from "@/features/workspace/data-display";
 import Link from "next/link";
 import { TaskReview } from "@/features/workspace/task-review";
 import { DocumentUpload } from "@/features/workspace/document-upload";
@@ -28,12 +34,19 @@ export default async function TaskPage({
   const parsed = commentQuery.safeParse(await searchParams);
   if (!parsed.success)
     return (
-      <section className="panel workspace-panel">
-        <h1>Invalid comment page</h1>
-        <Link href={`/workspace/${firmId}/tasks/${taskId}`}>
-          Return to task
-        </Link>
-      </section>
+      <EdgeState
+        title="Invalid comment page"
+        action={
+          <Link
+            className="form-cancel"
+            href={`/workspace/${firmId}/tasks/${taskId}`}
+          >
+            Return to task
+          </Link>
+        }
+      >
+        Check the comment page number or return to the latest task activity.
+      </EdgeState>
     );
   const data = await pageRecord(() =>
     tasks().detail(actor, pageResourceId(taskId), parsed.data),
@@ -41,7 +54,32 @@ export default async function TaskPage({
   const record = data.task;
   const reviewPage = Number((await searchParams).reviewPage ?? 1);
   if (!Number.isInteger(reviewPage) || reviewPage < 1 || reviewPage > 10000)
-    return <p>Invalid review page.</p>;
+    return (
+      <EdgeState
+        title="Invalid review page"
+        action={
+          <Link
+            className="form-cancel"
+            href={`/workspace/${firmId}/tasks/${taskId}`}
+          >
+            Return to task
+          </Link>
+        }
+      >
+        Check the review page number or return to the latest task activity.
+      </EdgeState>
+    );
+  const detailPage = (changes: {
+    reviewPage?: number;
+    commentPage?: number;
+  }) => {
+    const pages = {
+      reviewPage,
+      commentPage: parsed.data.commentPage,
+      ...changes,
+    };
+    return `?${new URLSearchParams({ reviewPage: String(pages.reviewPage), commentPage: String(pages.commentPage) })}`;
+  };
   const history = await reviews().list(firmId, taskId, reviewPage);
   const latest = (
     reviewPage === 1 ? history : await reviews().list(firmId, taskId, 1)
@@ -71,12 +109,23 @@ export default async function TaskPage({
           <p className="eyebrow">{record.companyName}</p>
           <h1>{record.title}</h1>
           <p className="page-description">
-            Due {record.dueDate} · {record.priority} priority ·{" "}
+            Due <DateLabel value={record.dueDate} /> ·{" "}
+            <DataBadge value={record.priority} /> ·{" "}
             {record.assigneeName ?? "Unassigned"}
             {record.assigneeRevokedAt ? " (access removed)" : ""}
           </p>
         </div>
       </div>
+      <p className="task-stage">
+        <DataBadge value={record.status} />
+        <span>Prepare work → Independent review → Complete with evidence</span>
+      </p>
+      <nav className="record-jumps" aria-label="Task sections">
+        <a href="#task-progress">Progress &amp; checklist</a>
+        <a href="#task-documents">Documents</a>
+        <a href="#task-review">Review &amp; approval</a>
+        <a href="#task-comments">Comments</a>
+      </nav>
       {archived && (
         <p className="workspace-readonly">
           The company is archived. Its work records are read-only.
@@ -116,7 +165,16 @@ export default async function TaskPage({
         </section>
         <WorkHistory events={events} />
       </div>
-      <section className="panel workspace-panel">
+      <TaskWork
+        key={record.version}
+        firmId={firmId}
+        task={record}
+        checklist={data.checklist}
+        canManage={manager}
+        canWork={worker}
+        archived={archived}
+      />
+      <section className="panel workspace-panel" id="task-documents">
         <h2>Private task documents</h2>
         <DocumentList firmId={firmId} items={files} />
         <Link
@@ -141,7 +199,7 @@ export default async function TaskPage({
           </p>
         )}
       </section>
-      <section className="panel workspace-panel">
+      <section className="panel workspace-panel" id="task-review">
         <h2>Formal review and approval</h2>
         {latest?.outcome === "pending" && (
           <p>
@@ -166,22 +224,33 @@ export default async function TaskPage({
           }
         />
         {history.map((review) => (
-          <article className="workspace-activity work-preserve" key={review.id}>
+          <article className="review-history-card" key={review.id}>
             <h3>
-              {review.outcome.replaceAll("_", " ")} · submitted version{" "}
+              <DataBadge value={review.outcome} /> · submitted version{" "}
               {review.submittedVersion}
             </h3>
             <p>
-              Submitted {review.submittedAt.toISOString()} ·{" "}
+              Submitted {displayTimestamp(review.submittedAt)} ·{" "}
               {review.submitterName} · reviewer {review.reviewerName}
             </p>
-            <p>{review.evidence}</p>
-            <p>{review.feedback}</p>
+            <p className="work-preserve">
+              <strong>Submission summary</strong>
+              <br />
+              {review.evidence}
+            </p>
+            {review.feedback && (
+              <p className="work-preserve">
+                <strong>Review feedback</strong>
+                <br />
+                {review.feedback}
+              </p>
+            )}
             <details>
               <summary>Submitted task and evidence snapshot</summary>
               <p>
-                {review.snapshot.title} · due {review.snapshot.dueDate} ·{" "}
-                {review.snapshot.priority} priority
+                {review.snapshot.title} · due{" "}
+                <DateLabel value={review.snapshot.dueDate} /> ·{" "}
+                {displayLabel(review.snapshot.priority)} priority
               </p>
               <p>{review.snapshot.description}</p>
               <ul>
@@ -195,6 +264,7 @@ export default async function TaskPage({
                 {review.snapshot.documents.map((file) => (
                   <li key={file.id}>
                     <a
+                      className="text-link"
                       href={`/api/firms/${firmId}/documents/${file.id}/download`}
                     >
                       {file.name}
@@ -206,7 +276,8 @@ export default async function TaskPage({
             </details>
             {review.decidedAt && (
               <p>
-                Decision {review.decidedAt.toISOString()} · {review.deciderName}
+                Decision {displayTimestamp(review.decidedAt)} ·{" "}
+                {review.deciderName}
               </p>
             )}
           </article>
@@ -215,23 +286,23 @@ export default async function TaskPage({
         <nav className="workspace-pagination" aria-label="Review pages">
           <span>Review page {reviewPage}</span>
           {reviewPage > 1 && (
-            <Link href={`?reviewPage=${reviewPage - 1}`}>Newer reviews</Link>
+            <Link
+              href={`${detailPage({ reviewPage: reviewPage - 1 })}#task-review`}
+            >
+              Newer reviews
+            </Link>
           )}
           {history.length === 10 && (
-            <Link href={`?reviewPage=${reviewPage + 1}`}>Older reviews</Link>
+            <Link
+              href={`${detailPage({ reviewPage: reviewPage + 1 })}#task-review`}
+            >
+              Older reviews
+            </Link>
           )}
         </nav>
       </section>
-      <TaskWork
-        key={record.version}
-        firmId={firmId}
-        task={record}
-        checklist={data.checklist}
-        canManage={manager}
-        canWork={worker}
-        archived={archived}
-      />
-      <section className="panel workspace-panel">
+
+      <section className="panel workspace-panel" id="task-comments">
         <h2>Comments · {data.commentTotal}</h2>
         {data.comments.length ? (
           <ul className="workspace-activity">
@@ -240,12 +311,7 @@ export default async function TaskPage({
                 <strong>{comment.authorName}</strong>
                 <p className="work-preserve">{comment.body}</p>
                 <time dateTime={comment.createdAt.toISOString()}>
-                  {new Intl.DateTimeFormat("en-IN", {
-                    timeZone: "Asia/Kolkata",
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  }).format(comment.createdAt)}{" "}
-                  IST
+                  {displayTimestamp(comment.createdAt)}
                 </time>
               </li>
             ))}
@@ -256,12 +322,16 @@ export default async function TaskPage({
         <nav className="workspace-pagination" aria-label="Comment pages">
           <span>Latest first · page {parsed.data.commentPage}</span>
           {parsed.data.commentPage > 1 && (
-            <Link href={`?commentPage=${parsed.data.commentPage - 1}`}>
+            <Link
+              href={`${detailPage({ commentPage: parsed.data.commentPage - 1 })}#task-comments`}
+            >
               Newer comments
             </Link>
           )}
           {parsed.data.commentPage * 20 < data.commentTotal && (
-            <Link href={`?commentPage=${parsed.data.commentPage + 1}`}>
+            <Link
+              href={`${detailPage({ commentPage: parsed.data.commentPage + 1 })}#task-comments`}
+            >
               Older comments
             </Link>
           )}

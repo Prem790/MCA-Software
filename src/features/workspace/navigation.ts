@@ -40,3 +40,19 @@ export function navigationIsActive(
   const prefix = item.activePrefix ?? item.href;
   return path === prefix || path.startsWith(prefix + "/");
 }
+
+// Display labels and initials only; membership authorization stays on the server.
+export const memberRoleLabels: Record<MemberRole, string> = {
+  admin: "Administrator",
+  manager: "Manager",
+  staff: "Staff",
+};
+export function firmInitials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => Array.from(word)[0] ?? "")
+    .join("")
+    .toUpperCase();
+}

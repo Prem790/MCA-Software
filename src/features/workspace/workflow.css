@@ -1,0 +1,405 @@
+/* Form and task workflow surfaces; business state remains server-owned. */
+.workflow-form {
+  gap: 20px;
+}
+.workflow-fields {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.workflow-fields > legend {
+  font-size: 15px;
+  color: var(--foreground);
+  font-weight: 600;
+  padding: 0 0 16px;
+}
+.form-guidance {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.required-mark {
+  color: #93502d;
+  font-weight: 700;
+}
+.workflow-form .field-label {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 600;
+}
+.workflow-form .field-label input,
+.workflow-form .field-label select,
+.workflow-form textarea {
+  font-size: 14px;
+  font-weight: 400;
+  border-color: var(--control-border);
+  border-radius: 8px;
+}
+.workflow-form textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.7;
+}
+.workflow-form input::placeholder,
+.workflow-form textarea::placeholder {
+  color: #637362;
+  opacity: 1;
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.form-actions > button {
+  min-height: 44px;
+}
+.form-cancel {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  color: var(--primary);
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.form-cancel:hover {
+  background: var(--muted);
+}
+.workflow-callout {
+  border-left: 3px solid #8fa77b;
+  padding: 14px 16px;
+  border-radius: 0 8px 8px 0;
+  background: #f2f6ec;
+}
+.workflow-form .work-check {
+  padding: 14px;
+  border: 1px solid var(--control-border);
+  border-radius: 9px;
+  background: #f8faf4;
+}
+.work-check input {
+  accent-color: var(--primary);
+}
+.workflow-form[aria-busy="true"] button[type="submit"]::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ui-spin 0.85s linear infinite;
+}
+.work-feedback {
+  display: grid;
+  gap: 12px;
+}
+.feedback-hint {
+  font-size: 12px;
+  line-height: 1.7;
+}
+.work-feedback button {
+  justify-self: start;
+}
+.workflow-confirmation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #fff7e9;
+  border: 1px solid #e5cfaa;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+.workflow-confirmation > p,
+.workflow-confirmation > span {
+  flex-basis: 100%;
+  color: #755025;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.live-workspace .work-checklist li {
+  flex-wrap: wrap;
+  padding: 16px;
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fcfdf9;
+}
+.work-checklist .work-check {
+  flex: 1;
+  min-width: 180px;
+  overflow-wrap: anywhere;
+}
+.work-checklist .workflow-confirmation {
+  flex-basis: 100%;
+  margin: 0;
+}
+.workflow-empty {
+  padding: 16px;
+  border: 1px dashed var(--control-border);
+  border-radius: 9px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 16px 0;
+}
+.document-cards {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  display: grid;
+  gap: 12px;
+}
+.document-cards li {
+  display: flex;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  background: #fcfdf9;
+}
+.document-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 44px;
+  background: var(--muted);
+  border-radius: 8px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.document-info {
+  flex: 1;
+  min-width: 140px;
+  overflow-wrap: anywhere;
+}
+.document-info strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.document-info p {
+  margin: 7px 0;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+.document-download {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 13px;
+  color: var(--primary);
+  background: white;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.document-download:hover {
+  background: var(--muted);
+}
+.upload-form {
+  padding: 20px;
+  border: 1px dashed var(--control-border);
+  border-radius: 12px;
+  background: #f8faf4;
+}
+.upload-form input[type="file"] {
+  padding: 12px;
+  background: white;
+}
+.upload-form input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--control-border);
+  border-radius: 6px;
+  background: var(--muted);
+  color: var(--primary);
+  font: inherit;
+  cursor: pointer;
+}
+.upload-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.upload-selection span {
+  color: var(--text-muted);
+}
+.upload-progress {
+  color: var(--primary);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.record-jumps,
+.task-stage {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.task-stage > span:last-child {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.record-jumps a,
+.live-workspace .work-record-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  background: white;
+  text-decoration: none;
+}
+.record-jumps a:hover,
+.live-workspace .work-record-links a:hover {
+  background: var(--muted);
+}
+#task-progress,
+#task-documents,
+#task-review,
+#task-comments {
+  scroll-margin-top: 24px;
+}
+.review-form {
+  border: 1px solid var(--control-border);
+  background: #f8faf4;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.review-history-card {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.review-history-card h3 {
+  font-size: 13px;
+  font-weight: 600;
+}
+.review-history-card p {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.review-history-card details {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f7f9f3;
+}
+.review-history-card summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+.review-history-card ul {
+  padding-left: 20px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.company-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.company-overview dt {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.company-overview dd {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.live-workspace .company-status-panel {
+  border-color: #ddc5a3;
+  background: #fffaf1;
+}
+.workspace-add-director summary {
+  display: list-item;
+  padding: 14px 18px;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background: var(--muted);
+  color: var(--primary);
+}
+@media (max-width: 600px) {
+  .workflow-form .field-label input,
+  .workflow-form .field-label select,
+  .workflow-form textarea {
+    font-size: 16px;
+  }
+  .form-actions {
+    align-items: stretch;
+  }
+  .form-actions > button,
+  .form-actions > a {
+    flex: 1;
+    justify-content: center;
+  }
+  .document-download {
+    width: 100%;
+  }
+  .review-form,
+  .review-history-card,
+  .upload-form {
+    padding: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workflow-form[aria-busy="true"] button[type="submit"]::before {
+    animation: none;
+  }
+}
+.template-create > summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 16px;
+  padding: 10px 0;
+}
+.document-company-picker {
+  max-width: 560px;
+}

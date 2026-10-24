@@ -1,9 +1,18 @@
+import {
+  ScrollableTable,
+  DataBadge,
+  EmptyRecords,
+  RecordLink,
+  DataPagination,
+} from "@/features/workspace/data-views";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { pageActor } from "@/platform/auth/page-session";
 import { companies } from "@/platform/application/services";
 import { canManageCompanies } from "@/modules/firms";
 import { companyQuery } from "@/modules/companies/contracts";
+import { memberRoleLabels } from "@/features/workspace/navigation";
+import { EdgeState } from "@/features/workspace/edge-state";
 
 type Params = Record<string, string | string[] | undefined>;
 export default async function CompanyList({
@@ -18,13 +27,16 @@ export default async function CompanyList({
   const parsed = companyQuery.safeParse(await searchParams);
   if (!parsed.success)
     return (
-      <section className="panel workspace-panel">
-        <h1>Invalid search filters</h1>
-        <p>Check the search text and page number.</p>
-        <Link href={`/workspace/${firmId}/companies`} className="text-link">
-          Clear filters
-        </Link>
-      </section>
+      <EdgeState
+        title="Invalid search filters"
+        action={
+          <Link href={`/workspace/${firmId}/companies`} className="form-cancel">
+            Clear filters
+          </Link>
+        }
+      >
+        Check the search text and page number.
+      </EdgeState>
     );
   const query = parsed.data;
   const result = await companies().list(actor, query);
@@ -36,7 +48,7 @@ export default async function CompanyList({
       <div className="page-heading">
         <div>
           <p className="eyebrow">
-            {actor.firmName} · {actor.role}
+            {actor.firmName} · {memberRoleLabels[actor.role]}
           </p>
           <h1>Companies</h1>
           <p className="page-description">Your firm’s saved company records.</p>
@@ -78,11 +90,13 @@ export default async function CompanyList({
           <Link href={path} className="text-link">
             Clear filters
           </Link>
-          <span className="filter-count">{result.total} companies</span>
+          <span className="filter-count">
+            {result.total} {result.total === 1 ? "company" : "companies"}
+          </span>
         </form>
         {result.items.length ? (
-          <div className="table-scroll">
-            <table className="data-table">
+          <ScrollableTable label="Company records table">
+            <table className="data-table workspace-data-table">
               <caption className="sr-only">
                 Saved company records for {actor.firmName}
               </caption>
@@ -98,44 +112,67 @@ export default async function CompanyList({
                 {result.items.map((company) => (
                   <tr key={company.id}>
                     <td>
-                      <Link
-                        href={`${path}/${company.id}`}
-                        className="text-link"
-                      >
+                      <RecordLink href={`${path}/${company.id}`}>
                         {company.name}
-                      </Link>
+                      </RecordLink>
                     </td>
                     <td>{company.companyType ?? "Not provided"}</td>
-                    <td>{company.contactEmail ?? "Not provided"}</td>
-                    <td>{company.archivedAt ? "Archived" : "Active"}</td>
+                    <td>
+                      {company.contactEmail ?? (
+                        <span className="data-muted">Not provided</span>
+                      )}
+                    </td>
+                    <td>
+                      <DataBadge
+                        value={company.archivedAt ? "archived" : "active"}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollableTable>
         ) : (
-          <div className="workspace-empty">
-            <h2>{query.q ? "No matching companies" : "No companies yet"}</h2>
-            <p>
-              {query.q
+          <EmptyRecords
+            title={
+              result.total > 0
+                ? "No companies on this page"
+                : query.q
+                  ? "No matching companies"
+                  : query.archived === "active"
+                    ? "No active companies"
+                    : "No companies yet"
+            }
+            action={
+              result.total > 0 ? (
+                <Link href={pageLink(1)} className="form-cancel">
+                  First page
+                </Link>
+              ) : canManageCompanies(actor.role) && !query.q ? (
+                <Button asChild>
+                  <Link href={`${path}/new`}>Add company record</Link>
+                </Button>
+              ) : undefined
+            }
+          >
+            {result.total > 0
+              ? "This page has no records. Return to the first page or adjust your filters."
+              : query.q
                 ? "Try another company name or clear the filters."
-                : "Add your first company to start organizing its records."}
-            </p>
-          </div>
+                : query.archived === "active"
+                  ? "No active companies match this view. Include archived records to find a company that was archived."
+                  : canManageCompanies(actor.role)
+                    ? "Add a company to start organizing its records."
+                    : "Company records will appear here when your administrator or manager adds them."}
+          </EmptyRecords>
         )}
-        <nav aria-label="Company pages" className="workspace-pagination">
-          <span>Page {query.page} · 20 records per page</span>
-          {query.page > 1 && (
-            <Link href={pageLink(query.page - 1)} className="text-link">
-              Previous page
-            </Link>
-          )}
-          {query.page * 20 < result.total && (
-            <Link href={pageLink(query.page + 1)} className="text-link">
-              Next page
-            </Link>
-          )}
-        </nav>
+        <DataPagination
+          label="Company pages"
+          total={result.total}
+          page={query.page}
+          count={result.items.length}
+          pageLink={pageLink}
+        />
       </section>
     </>
   );

@@ -64,9 +64,11 @@
   display: inline-flex;
   gap: 4px;
   align-items: center;
-  font-size: 11px;
-  color: #14746b;
+  font-size: 13px;
+  color: var(--primary);
   font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .text-link:hover,
 .subtle-link:hover {

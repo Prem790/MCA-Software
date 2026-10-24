@@ -1,3 +1,7 @@
+import { EdgeState } from "@/features/workspace/edge-state";
+import { DateLabel, DataPagination } from "@/features/workspace/data-views";
+import { displayDate, displayMonth } from "@/features/workspace/data-display";
+import { indiaToday } from "@/lib/work-dates";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { pageActor, pageRecord } from "@/platform/auth/page-session";
@@ -20,15 +24,22 @@ export default async function CalendarPage({
   const parsed = calendarQuery.safeParse(await searchParams);
   if (!parsed.success)
     return (
-      <section className="panel workspace-panel">
-        <h1>Invalid calendar filters</h1>
-        <Link href={path}>Reset calendar</Link>
-      </section>
+      <EdgeState
+        title="Invalid calendar filters"
+        action={
+          <Link href={path} className="form-cancel">
+            Reset calendar
+          </Link>
+        }
+      >
+        Choose a supported month and company, then try again.
+      </EdgeState>
     );
   const query = parsed.data;
   const data = await reporting().calendar(actor, query);
   const options = await pageRecord(() => workOptions(actor, query.companyId));
   const range = monthDetails(data.month);
+  const today = indiaToday();
   const scope: Record<string, string> = {
     ...(query.companyId ? { companyId: query.companyId } : {}),
     archived: query.archived,
@@ -51,8 +62,8 @@ export default async function CalendarPage({
           </p>
         </div>
       </div>
-      <section className="panel workspace-panel">
-        <form className="workspace-form" action={path}>
+      <section className="panel workspace-panel calendar-panel">
+        <form className="workspace-form calendar-filter-form" action={path}>
           <div className="report-filter-grid">
             <CompanyPicker
               companies={options.companies}
@@ -90,14 +101,31 @@ export default async function CalendarPage({
               Previous month
             </Link>
           )}
-          <strong>{data.month}</strong>
+          <h2>{displayMonth(data.month)}</h2>
           {range.next && (
             <Link href={link({ month: range.next, day: range.next + "-01" })}>
               Next month
             </Link>
           )}
-          <Link href={path}>Current month</Link>
+          <Link href={`${path}?${new URLSearchParams(scope)}`}>
+            Current month
+          </Link>
         </nav>
+        <div
+          className="calendar-legend"
+          role="group"
+          aria-label="Calendar legend"
+        >
+          <span>
+            <i className="calendar-dot task-dot" aria-hidden="true" />
+            Tasks
+          </span>
+          <span>
+            <i className="calendar-dot obligation-dot" aria-hidden="true" />
+            Confirmed obligations
+          </span>
+          <span>Outlined date: selected · Filled day number: today</span>
+        </div>
         <div className="calendar-weekdays" aria-hidden="true">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
             <span key={day}>{day}</span>
@@ -105,7 +133,7 @@ export default async function CalendarPage({
         </div>
         <ol
           className="deadline-calendar"
-          aria-label={`Deadline counts for ${data.month}`}
+          aria-label={`Deadline counts for ${displayMonth(data.month)}`}
         >
           {range.days.map((day, index) => (
             <li
@@ -115,13 +143,28 @@ export default async function CalendarPage({
               }
             >
               <Link
-                href={link({ day })}
+                href={`${link({ day })}#day-agenda`}
+                data-today={day === today}
                 aria-current={day === data.day ? "date" : undefined}
-                aria-label={`${day}: ${tasks.get(day) ?? 0} tasks, ${obligations.get(day) ?? 0} obligations`}
+                aria-label={`${displayDate(day)}${day === today ? ", today" : ""}: ${tasks.get(day) ?? 0} ${tasks.get(day) === 1 ? "task" : "tasks"}, ${obligations.get(day) ?? 0} confirmed ${obligations.get(day) === 1 ? "obligation" : "obligations"}`}
               >
-                <strong>{Number(day.slice(8))}</strong>
-                <span>{tasks.get(day) ?? 0} tasks</span>
-                <span>{obligations.get(day) ?? 0} obligations</span>
+                <strong className="calendar-day-number">
+                  {Number(day.slice(8))}
+                </strong>
+                {!!tasks.get(day) && (
+                  <span className="calendar-count" aria-hidden="true">
+                    <i className="calendar-dot task-dot" />
+                    {tasks.get(day)}
+                    <span className="calendar-count-label"> tasks</span>
+                  </span>
+                )}
+                {!!obligations.get(day) && (
+                  <span className="calendar-count" aria-hidden="true">
+                    <i className="calendar-dot obligation-dot" />
+                    {obligations.get(day)}
+                    <span className="calendar-count-label"> obligations</span>
+                  </span>
+                )}
               </Link>
             </li>
           ))}
@@ -132,70 +175,54 @@ export default async function CalendarPage({
           are excluded.
         </p>
       </section>
-      <section className="panel workspace-panel">
+      <section className="panel workspace-panel" id="day-agenda" tabIndex={-1}>
         <h2>
-          Tasks due {data.day} · {data.taskTotal}
+          Tasks due <DateLabel value={data.day} /> · {data.taskTotal}
         </h2>
-        <ReportTable firmId={firmId} kind="tasks" items={data.tasks} />
-        <nav className="workspace-pagination" aria-label="Calendar task pages">
-          <span>Page {query.taskPage}</span>
-          {query.taskPage > 1 && (
-            <Link
-              href={link({
-                taskPage: String(query.taskPage - 1),
-                obligationPage: String(query.obligationPage),
-              })}
-            >
-              Previous
-            </Link>
-          )}
-          {query.taskPage * 20 < data.taskTotal && (
-            <Link
-              href={link({
-                taskPage: String(query.taskPage + 1),
-                obligationPage: String(query.obligationPage),
-              })}
-            >
-              Next
-            </Link>
-          )}
-        </nav>
+        <ReportTable
+          firmId={firmId}
+          kind="tasks"
+          items={data.tasks}
+          emptyTitle="No tasks due on this day"
+          emptyDescription="Select another date to see its saved task deadlines."
+        />
+        <DataPagination
+          label="Calendar task pages"
+          total={data.taskTotal}
+          page={query.taskPage}
+          count={data.tasks.length}
+          pageLink={(page) =>
+            link({
+              taskPage: String(page),
+              obligationPage: String(query.obligationPage),
+            })
+          }
+        />
       </section>
       <section className="panel workspace-panel">
         <h2>
-          Confirmed obligations due {data.day} · {data.obligationTotal}
+          Confirmed obligations due <DateLabel value={data.day} /> ·{" "}
+          {data.obligationTotal}
         </h2>
         <ReportTable
           firmId={firmId}
           kind="obligations"
           items={data.obligations}
+          emptyTitle="No confirmed obligations due on this day"
+          emptyDescription="Only obligations with user-confirmed dates appear in the calendar."
         />
-        <nav
-          className="workspace-pagination"
-          aria-label="Calendar obligation pages"
-        >
-          <span>Page {query.obligationPage}</span>
-          {query.obligationPage > 1 && (
-            <Link
-              href={link({
-                obligationPage: String(query.obligationPage - 1),
-                taskPage: String(query.taskPage),
-              })}
-            >
-              Previous
-            </Link>
-          )}
-          {query.obligationPage * 20 < data.obligationTotal && (
-            <Link
-              href={link({
-                obligationPage: String(query.obligationPage + 1),
-                taskPage: String(query.taskPage),
-              })}
-            >
-              Next
-            </Link>
-          )}
-        </nav>
+        <DataPagination
+          label="Calendar obligation pages"
+          total={data.obligationTotal}
+          page={query.obligationPage}
+          count={data.obligations.length}
+          pageLink={(page) =>
+            link({
+              obligationPage: String(page),
+              taskPage: String(query.taskPage),
+            })
+          }
+        />
       </section>
     </>
   );

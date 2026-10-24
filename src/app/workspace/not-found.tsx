@@ -1,12 +1,9 @@
-import Link from "next/link";
+import { EdgeState } from "@/features/workspace/edge-state";
 export default function NotFound() {
   return (
-    <section className="panel workspace-panel">
-      <h1>Workspace record not found</h1>
-      <p>This record is unavailable in your firm.</p>
-      <Link href="/workspace" className="text-link">
-        Return to your firms
-      </Link>
-    </section>
+    <EdgeState title="Workspace record not found">
+      This record is unavailable in your firm. It may have moved, or your
+      account may not have access. Return to your firms to continue.
+    </EdgeState>
   );
 }

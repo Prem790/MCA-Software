@@ -1,15 +1,11 @@
-import Link from "next/link";
 import { AccountCard } from "./account-card";
 export function SignInUnavailable() {
   return (
-    <AccountCard title="Sign-in is unavailable">
+    <AccountCard title="Sign-in is unavailable" showSignInLink={false}>
       <p>
         Your workspace is not ready for sign-in yet. Contact the person who
         manages your firm’s access.
       </p>
-      <Link href="/" className="text-link">
-        Back to homepage
-      </Link>
     </AccountCard>
   );
 }

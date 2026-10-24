@@ -1,3 +1,5 @@
+import { displayTimestamp } from "@/features/workspace/data-display";
+import { memberRoleLabels } from "@/features/workspace/navigation";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -37,7 +39,7 @@ export default async function CompanyDetail({
       <div className="page-heading">
         <div>
           <p className="eyebrow">
-            {actor.firmName} · {actor.role}
+            {actor.firmName} · {memberRoleLabels[actor.role]}
           </p>
           <h1>{company.name}</h1>
           <p className="page-description">
@@ -94,6 +96,22 @@ export default async function CompanyDetail({
       <div className="workspace-detail-grid">
         <section className="panel workspace-panel">
           <h2>Company information</h2>
+          {writable && (
+            <dl className="company-overview">
+              <div>
+                <dt>Company type</dt>
+                <dd>{company.companyType ?? "Not provided"}</dd>
+              </div>
+              <div>
+                <dt>CIN</dt>
+                <dd>{company.cin ?? "Not provided"}</dd>
+              </div>
+              <div>
+                <dt>Contact email</dt>
+                <dd>{company.contactEmail ?? "Not provided"}</dd>
+              </div>
+            </dl>
+          )}
           {writable ? (
             <CompanyForm firmId={firmId} company={company} />
           ) : (
@@ -130,12 +148,7 @@ export default async function CompanyDetail({
                   {event.actorName ?? "System"}
                 </span>
                 <time dateTime={event.occurredAt.toISOString()}>
-                  {new Intl.DateTimeFormat("en-GB", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                    timeZone: "Asia/Kolkata",
-                  }).format(event.occurredAt)}{" "}
-                  IST
+                  {displayTimestamp(event.occurredAt)}
                 </time>
               </li>
             ))}
@@ -153,7 +166,7 @@ export default async function CompanyDetail({
         />
       </section>
       {canManage && (
-        <section className="panel workspace-panel">
+        <section className="panel workspace-panel company-status-panel">
           <h2>Company status</h2>
           <ArchiveCompany
             firmId={firmId}

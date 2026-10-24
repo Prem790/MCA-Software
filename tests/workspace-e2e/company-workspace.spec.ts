@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../support/workspace-test";
 import AxeBuilder from "@axe-core/playwright";
 
 test("administrator persists company/director changes while staff remain read-only", async ({
@@ -36,26 +36,51 @@ test("administrator persists company/director changes while staff remain read-on
     .getByRole("link", { name: "Companies", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "No companies yet" }),
+    page.getByRole("heading", { name: "No active companies" }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Add company", exact: true }).click();
   await page
-    .getByLabel("Company name", { exact: true })
+    .getByRole("textbox", { name: "Company name", exact: true })
     .fill("Cedar Working Test Company");
   await page
     .getByLabel("Contact email (optional)", { exact: true })
     .fill("company@example.test");
-  await page
-    .getByRole("button", { name: "Create company", exact: true })
-    .click();
+  const createPage = new URL(page.url());
+  const createPath = createPage.pathname.replace(
+    /^\/workspace\/([^/]+)\/companies\/new$/,
+    "/api/firms/$1/companies",
+  );
+  // The first save and detail route compile on demand in the isolated dev
+  // server. Verify the save separately before waiting for its destination.
+  const [createdResponse] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.request().method() === "POST" &&
+        new URL(response.url()).pathname === createPath,
+      { timeout: 15000 },
+    ),
+    page.getByRole("button", { name: "Create company", exact: true }).click(),
+  ]);
+  expect(createdResponse.status()).toBe(201);
+  const created = (await createdResponse.json()) as { data: { id: string } };
+  expect(created.data).toMatchObject({
+    id: expect.any(String),
+    name: "Cedar Working Test Company",
+  });
+  const expectedDetail = new URL(createPage.href);
+  expectedDetail.pathname = expectedDetail.pathname.replace(
+    /\/companies\/new$/,
+    `/companies/${created.data.id}`,
+  );
+  await expect(page).toHaveURL(expectedDetail.href, { timeout: 15000 });
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Cedar Working Test Company",
   );
   const companyUrl = page.url();
   await page.reload();
-  await expect(page.getByLabel("Company name", { exact: true })).toHaveValue(
-    "Cedar Working Test Company",
-  );
+  await expect(
+    page.getByRole("textbox", { name: "Company name", exact: true }),
+  ).toHaveValue("Cedar Working Test Company");
   await page
     .getByLabel("Address (optional)", { exact: true })
     .fill("Fictional browser test address");
@@ -64,7 +89,7 @@ test("administrator persists company/director changes while staff remain read-on
   await page.getByText("Add a director", { exact: true }).click();
   const add = page.getByRole("form", { name: "Add director", exact: true });
   await add
-    .getByLabel("Director name", { exact: true })
+    .getByRole("textbox", { name: "Director name", exact: true })
     .fill("Alex Test Person");
   await add.getByRole("button", { name: "Add director", exact: true }).click();
   await expect(
