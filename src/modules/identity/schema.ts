@@ -1,5 +1,21 @@
 // Public persistence contract for Better Auth. Business code must use identity use cases.
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  boolean,
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
+
+// Shared across serverless instances; Better Auth atomically consumes these counters.
+export const rateLimit = pgTable("auth_rate_limit", {
+  id: text("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  count: integer("count").notNull(),
+  lastRequest: bigint("last_request", { mode: "number" }).notNull(),
+});
 
 export const user = pgTable("auth_user", {
   id: text("id").primaryKey(),

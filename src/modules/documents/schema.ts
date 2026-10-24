@@ -25,6 +25,12 @@ export const document = pgTable(
     originalName: text("original_name").notNull(),
     mediaType: text("media_type").notNull(),
     sizeBytes: bigint("size_bytes", { mode: "number" }).notNull(),
+    storageState: text("storage_state", {
+      enum: ["pending", "ready", "failed"],
+    })
+      .default("pending")
+      .notNull(),
+    sha256: text("sha256"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -42,6 +48,14 @@ export const document = pgTable(
       columns: [table.firmId, table.uploadedBy],
       foreignColumns: [membership.firmId, membership.userId],
     }),
+    check(
+      "document_storage_state_valid",
+      sql`${table.storageState} IN ('pending', 'ready', 'failed')`,
+    ),
+    check(
+      "ready_document_requires_hash",
+      sql`${table.storageState} <> 'ready' OR (${table.sha256} IS NOT NULL AND ${table.sha256} ~ '^[a-f0-9]{64}$')`,
+    ),
     check("document_positive_size", sql`${table.sizeBytes} > 0`),
     index("document_firm_company_idx").on(table.firmId, table.companyId),
   ],
