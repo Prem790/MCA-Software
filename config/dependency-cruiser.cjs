@@ -6,6 +6,7 @@ const modules = [
   "tasks",
   "documents",
   "audit",
+  "reporting",
 ];
 
 module.exports = {
@@ -34,7 +35,7 @@ module.exports = {
           from: { path: `^src/modules/${owner}/` },
           to: {
             path: `^src/modules/${other}/`,
-            pathNot: `^src/modules/${other}/(index|schema)\\.ts$`,
+            pathNot: `^src/modules/${other}/(index|schema|server)\\.ts$`,
           },
         })),
     ),
