@@ -1,3 +1,5 @@
+import { EdgeState } from "@/features/workspace/edge-state";
+import { DataPagination } from "@/features/workspace/data-views";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { pageActor, pageRecord } from "@/platform/auth/page-session";
@@ -23,11 +25,16 @@ export default async function ReportsPage({
   const parsed = reportQuery.safeParse(await searchParams);
   if (!parsed.success)
     return (
-      <section className="panel workspace-panel">
-        <h1>Invalid report filters</h1>
-        <p>Check the date range and selected values.</p>
-        <Link href={path}>Clear filters</Link>
-      </section>
+      <EdgeState
+        title="Invalid report filters"
+        action={
+          <Link href={path} className="form-cancel">
+            Clear filters
+          </Link>
+        }
+      >
+        Check the date range and selected values.
+      </EdgeState>
     );
   const query = parsed.data;
   if (
@@ -39,10 +46,16 @@ export default async function ReportsPage({
       query.reviewer !== "all")
   )
     return (
-      <section className="panel workspace-panel">
-        <h1>Task filters do not apply to obligations</h1>
-        <Link href={path}>Clear filters</Link>
-      </section>
+      <EdgeState
+        title="Task filters do not apply to obligations"
+        action={
+          <Link href={path} className="form-cancel">
+            Clear filters
+          </Link>
+        }
+      >
+        Choose compatible obligation filters to continue.
+      </EdgeState>
     );
   const data = await reporting().report(actor, kind, query);
   const options = await pageRecord(() => workOptions(actor, query.companyId));
@@ -50,6 +63,20 @@ export default async function ReportsPage({
   for (const [key, value] of Object.entries(query))
     if (value !== undefined && key !== "page") encoded.set(key, String(value));
   const pageLink = (page: number) => `${path}?${encoded}&page=${page}`;
+  const commonScope = new URLSearchParams();
+  for (const key of [
+    "q",
+    "companyId",
+    "archived",
+    "due",
+    "dateFrom",
+    "dateTo",
+  ] as const) {
+    const value = query[key];
+    if (value !== undefined) commonScope.set(key, value);
+  }
+  const typeLink = (target: "tasks" | "obligations") =>
+    `/workspace/${firmId}/reports/${target}?${target === kind ? encoded : commonScope}`;
   return (
     <>
       <div className="page-heading">
@@ -65,8 +92,16 @@ export default async function ReportsPage({
         className="workspace-actions work-record-links"
         aria-label="Report types"
       >
-        <Link href={`/workspace/${firmId}/reports/tasks`}>Task reports</Link>
-        <Link href={`/workspace/${firmId}/reports/obligations`}>
+        <Link
+          aria-current={kind === "tasks" ? "page" : undefined}
+          href={typeLink("tasks")}
+        >
+          Task reports
+        </Link>
+        <Link
+          aria-current={kind === "obligations" ? "page" : undefined}
+          href={typeLink("obligations")}
+        >
           Obligation reports
         </Link>
       </nav>
@@ -80,8 +115,10 @@ export default async function ReportsPage({
       </section>
       <section className="panel workspace-panel">
         <p>
-          {data.total} matching {kind}. CSV exports include every matching row
-          up to 1,000, independent of the page shown.
+          {data.total} matching{" "}
+          {data.total === 1 ? (kind === "tasks" ? "task" : "obligation") : kind}
+          . CSV exports include all matching rows, independent of this page.
+          Narrow filters if the result exceeds 1,000 rows or 3 MB.
         </p>
         {kind === "obligations" && (
           <p className="workspace-note">
@@ -100,15 +137,13 @@ export default async function ReportsPage({
           </p>
         )}
         <ReportTable firmId={firmId} kind={kind} items={data.items} />
-        <nav className="workspace-pagination" aria-label="Report pages">
-          <span>Page {query.page} · 20 per page</span>
-          {query.page > 1 && (
-            <Link href={pageLink(query.page - 1)}>Previous</Link>
-          )}
-          {query.page * 20 < data.total && (
-            <Link href={pageLink(query.page + 1)}>Next</Link>
-          )}
-        </nav>
+        <DataPagination
+          label="Report pages"
+          total={data.total}
+          page={query.page}
+          count={data.items.length}
+          pageLink={pageLink}
+        />
       </section>
     </>
   );

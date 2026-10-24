@@ -1,23 +1,28 @@
-import Link from "next/link";
+import { DataBadge, DateLabel, EmptyRecords, RecordLink } from "./data-views";
 import type { ReportKind, ReportRow } from "@/modules/reporting/contracts";
 export function ReportTable({
   firmId,
   kind,
   items,
+  emptyTitle = "No matching records",
+  emptyDescription = "Try another filter or clear the current selection.",
 }: {
   firmId: string;
   kind: ReportKind;
   items: ReportRow[];
+  emptyTitle?: string;
+  emptyDescription?: string;
 }) {
   if (!items.length)
-    return (
-      <div className="workspace-empty">
-        <p>No matching {kind}. Try another filter or create a record.</p>
-      </div>
-    );
+    return <EmptyRecords title={emptyTitle}>{emptyDescription}</EmptyRecords>;
   return (
-    <div className="table-scroll">
-      <table className="data-table">
+    <div
+      className="table-scroll"
+      role="region"
+      aria-label="Report records table"
+      tabIndex={0}
+    >
+      <table className="data-table workspace-data-table">
         <caption className="sr-only">
           {kind === "tasks" ? "Task report" : "Obligation report"}
         </caption>
@@ -44,32 +49,43 @@ export function ReportTable({
           {items.map((row) => (
             <tr key={row.id}>
               <td>
-                <Link
-                  className="text-link"
-                  href={`/workspace/${firmId}/${kind}/${row.id}`}
-                >
+                <RecordLink href={`/workspace/${firmId}/${kind}/${row.id}`}>
                   {row.title}
-                </Link>
+                </RecordLink>
               </td>
               <td>
                 {row.companyName}
-                {row.companyArchivedAt ? " (archived)" : ""}
+                {row.companyArchivedAt && (
+                  <span className="cell-secondary">Archived company</span>
+                )}
               </td>
-              <td>{row.dueDate}</td>
+              <td>
+                <DateLabel value={row.dueDate} />
+              </td>
               {kind === "tasks" ? (
                 <>
                   <td>
                     {row.assigneeName ?? "Unassigned"}
-                    {row.assigneeRevokedAt ? " (access removed)" : ""}
+                    {row.assigneeRevokedAt && (
+                      <span className="cell-secondary">Access removed</span>
+                    )}
                   </td>
-                  <td>{row.priority}</td>
-                  <td>{row.status?.replaceAll("_", " ")}</td>
+                  <td>
+                    <DataBadge value={row.priority} />
+                  </td>
+                  <td>
+                    <DataBadge value={row.status} />
+                  </td>
                 </>
               ) : (
                 <>
                   <td>{row.reportingPeriod}</td>
                   <td>
-                    {row.confirmed ? "User confirmed" : "Needs confirmation"}
+                    <DataBadge
+                      value={row.confirmed ? "confirmed" : "unconfirmed"}
+                    >
+                      {row.confirmed ? "User confirmed" : "Needs confirmation"}
+                    </DataBadge>
                   </td>
                 </>
               )}
