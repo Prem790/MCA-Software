@@ -1,3 +1,5 @@
+import { displayTimestamp } from "@/features/workspace/data-display";
+import { EdgeState } from "@/features/workspace/edge-state";
 import Link from "next/link";
 import { pageActor } from "@/platform/auth/page-session";
 import { teams } from "@/platform/application/services";
@@ -20,28 +22,27 @@ export default async function TeamPage({
   const actor = await pageActor(firmId);
   if (actor.role !== "admin")
     return (
-      <section className="panel workspace-panel">
-        <h1>Administrator access required</h1>
-        <p>
-          Only your firm administrators can view and manage team membership.
-        </p>
-      </section>
+      <EdgeState title="Administrator access required">
+        Only your firm administrators can view and manage team membership.
+        Choose a firm where you have the required access, or contact its
+        administrator.
+      </EdgeState>
     );
   const query = teamQuery.safeParse(await searchParams);
   if (!query.success)
     return (
-      <section className="panel workspace-panel">
-        <h1>Invalid page</h1>
-        <Link href={`/workspace/${firmId}/team`}>Return to team</Link>
-      </section>
+      <EdgeState
+        title="Invalid page"
+        action={
+          <Link href={`/workspace/${firmId}/team`} className="form-cancel">
+            Return to team
+          </Link>
+        }
+      >
+        Choose a valid team page to continue.
+      </EdgeState>
     );
   const data = await teams().list(actor, query.data);
-  const format = (value: Date) =>
-    new Intl.DateTimeFormat("en-IN", {
-      timeZone: "Asia/Kolkata",
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(value);
   return (
     <>
       <div className="page-heading">
@@ -53,7 +54,6 @@ export default async function TeamPage({
           </p>
         </div>
       </div>
-      <InviteMember firmId={firmId} emailConfigured={!!readEmailConfig()} />
       <section className="panel workspace-panel">
         <h2>Active members</h2>
         <p>
@@ -75,6 +75,7 @@ export default async function TeamPage({
           )}
         </nav>
       </section>
+      <InviteMember firmId={firmId} emailConfigured={!!readEmailConfig()} />
       <TeamInvitations
         firmId={firmId}
         invitations={data.invitations.map((invite) => ({
@@ -82,7 +83,7 @@ export default async function TeamPage({
           email: invite.email,
           role: invite.role,
           deliveryStatus: invite.deliveryStatus,
-          expiresAt: format(invite.expiresAt),
+          expiresAt: invite.expiresAt.toISOString(),
           canCancel: !invite.acceptedAt && !invite.revokedAt,
           status: invite.status,
         }))}
@@ -98,7 +99,7 @@ export default async function TeamPage({
                 </strong>
                 {event.actorName ?? "System"}
                 <time dateTime={event.occurredAt.toISOString()}>
-                  {format(event.occurredAt)} IST
+                  {displayTimestamp(event.occurredAt)}
                 </time>
               </li>
             ))}
