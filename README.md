@@ -302,3 +302,10 @@ Changing an obligation deadline never silently reschedules its existing tasks.
 Phase 1 prototype routes have been retired; the full Phase 2 MVP remains in progress.
 REA is optional investigation tooling, not a runtime dependency. Reference
 assumptions and unknowns are recorded in [research boundaries](docs/research/reference-boundaries.md).
+
+The UX 1–6 implementation covers account entry, navigation, dashboards/data views,
+forms/workflows, calendar/reports/team and shared edge states. UX 1 has owner-reported
+passing automated checks; later changes still require integrated acceptance. The
+[whole-product review and acceptance checklist](docs/runbooks/ux-6-whole-product-consistency.md)
+records remaining visual, functional and CI work. These source changes do not establish
+production readiness.
