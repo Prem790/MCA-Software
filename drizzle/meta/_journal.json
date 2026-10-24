@@ -8,6 +8,27 @@
       "when": 1792674063744,
       "tag": "0000_initial_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792706444989,
+      "tag": "0001_team_onboarding",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792791374060,
+      "tag": "0002_compliance_work_management",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792793746133,
+      "tag": "0003_private_documents_and_review",
+      "breakpoints": true
     }
   ]
 }
