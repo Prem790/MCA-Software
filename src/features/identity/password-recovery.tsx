@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AccountCard } from "./account-card";
 import { authClient } from "./auth-client";
+import { PasswordField } from "./password-field";
 import { useLinkToken } from "./use-link-token";
 
 export function ForgotPassword({
@@ -40,17 +41,16 @@ export function ForgotPassword({
     }
   }
   return (
-    <AccountCard title="Forgot your password?">
-      <p>
-        Enter your account email address to request a link. Links expire after
-        one hour.
-      </p>
+    <AccountCard
+      title="Forgot your password?"
+      description="Enter your account email address to request a link. Links expire after one hour."
+    >
       {!emailConfigured && (
         <p className="workspace-readonly">
           Email recovery is not configured yet. Contact your administrator.
         </p>
       )}
-      <form onSubmit={submit} className="workspace-form">
+      <form onSubmit={submit} className="workspace-form" aria-busy={pending}>
         <label className="field-label">
           Email address
           <input
@@ -126,8 +126,8 @@ export function ResetPassword() {
           with your new password.
         </p>
       ) : (
-        <form onSubmit={submit} className="workspace-form">
-          <PasswordFields />
+        <form onSubmit={submit} className="workspace-form" aria-busy={pending}>
+          <PasswordFields disabled={pending} />
           {error && (
             <p className="form-error" role="alert">
               {error}
@@ -140,38 +140,39 @@ export function ResetPassword() {
       )}
       {!done && (
         <p className="workspace-note">
-          <Link href="/forgot-password">Request another reset link</Link>
+          <Link className="identity-text-link" href="/forgot-password">
+            Request another reset link
+          </Link>
         </p>
       )}
     </AccountCard>
   );
 }
 
-export function PasswordFields() {
+export function PasswordFields({
+  disabled = false,
+}: { disabled?: boolean } = {}) {
   return (
     <>
-      <label className="field-label">
-        New password (12–128 characters)
-        <input
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          minLength={12}
-          maxLength={128}
-          required
-        />
-      </label>
-      <label className="field-label">
-        Confirm password
-        <input
-          name="confirmation"
-          type="password"
-          autoComplete="new-password"
-          minLength={12}
-          maxLength={128}
-          required
-        />
-      </label>
+      <PasswordField
+        label="New password"
+        hint="Use 12–128 characters."
+        name="password"
+        autoComplete="new-password"
+        minLength={12}
+        maxLength={128}
+        required
+        disabled={disabled}
+      />
+      <PasswordField
+        label="Confirm password"
+        name="confirmation"
+        autoComplete="new-password"
+        minLength={12}
+        maxLength={128}
+        required
+        disabled={disabled}
+      />
     </>
   );
 }
