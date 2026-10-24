@@ -1,3 +1,5 @@
+import { EdgeState } from "@/features/workspace/edge-state";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { pageActor, pageRecord } from "@/platform/auth/page-session";
 import { companies, documents, tasks } from "@/platform/application/services";
@@ -25,18 +27,35 @@ export default async function DocumentsPage({
           Select an active company. Archived companies' files remain accessible
           through their company records.
         </p>
-        <ul>
-          {options.companies.map((company) => (
-            <li key={company.id}>
-              <Link href={`?companyId=${company.id}`}>{company.name}</Link>
-            </li>
-          ))}
-        </ul>
+        {!!options.companies.length && (
+          <form
+            className="workspace-form workflow-form document-company-picker"
+            action={`/workspace/${firmId}/documents`}
+          >
+            <label className="field-label">
+              Company
+              <select name="companyId" required defaultValue="">
+                <option value="" disabled>
+                  Choose a company
+                </option>
+                {options.companies.map((company) => (
+                  <option value={company.id} key={company.id}>
+                    {company.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Button type="submit">Open documents</Button>
+          </form>
+        )}
+
         {!options.companies.length && (
           <p>
             No active companies yet.{" "}
-            <Link href={`/workspace/${firmId}/companies`}>Open Companies</Link>{" "}
-            to create or restore one.
+            <Link className="text-link" href={`/workspace/${firmId}/companies`}>
+              Open Companies
+            </Link>{" "}
+            to view available company records.
           </p>
         )}
         {options.limited && (
@@ -51,10 +70,16 @@ export default async function DocumentsPage({
   const parsed = documentQuery.safeParse(query);
   if (!parsed.success)
     return (
-      <p>
-        Invalid document filters.{" "}
-        <Link href={`/workspace/${firmId}/documents`}>Choose a company</Link>
-      </p>
+      <EdgeState
+        title="Invalid document filters"
+        action={
+          <Link className="form-cancel" href={`/workspace/${firmId}/documents`}>
+            Choose a company
+          </Link>
+        }
+      >
+        Choose a company again to view its documents.
+      </EdgeState>
     );
   const input = parsed.data;
   const detail = await pageRecord(() =>
@@ -64,7 +89,22 @@ export default async function DocumentsPage({
     ? await pageRecord(() => tasks().detail(actor, input.taskId!))
     : undefined;
   if (linked && linked.task.companyId !== input.companyId)
-    return <p>Task was not found in this company.</p>;
+    return (
+      <EdgeState
+        title="Task unavailable in this company"
+        action={
+          <Link
+            className="form-cancel"
+            href={`/workspace/${firmId}/documents?companyId=${input.companyId}`}
+          >
+            Open company documents
+          </Link>
+        }
+      >
+        This task does not belong to the selected company. Choose a task from
+        that company's records.
+      </EdgeState>
+    );
   const files = await documents().list(actor, input);
   const writable =
     !detail.company.archivedAt &&
@@ -81,6 +121,7 @@ export default async function DocumentsPage({
         {linked ? "Task documents" : "Company documents"}
       </h1>
       <Link
+        className="text-link"
         href={
           linked
             ? `/workspace/${firmId}/tasks/${linked.task.id}`
@@ -110,8 +151,8 @@ export default async function DocumentsPage({
       )}
       {!enabled && (
         <p>
-          Private storage is not configured yet. An operator must connect a
-          private Vercel Blob store.
+          Private uploads are not available yet. Contact your firm administrator
+          to enable document storage.
         </p>
       )}
       {!writable && (

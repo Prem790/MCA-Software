@@ -1,9 +1,10 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
+import { useId, useRef, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MAX_DOCUMENT_BYTES } from "@/modules/documents/contracts";
 import { uploadWorkspaceDocument } from "./api-client";
+import { displayFileSize } from "./data-display";
 import { WorkFeedback } from "./work-feedback";
 export function DocumentUpload({
   firmId,
@@ -18,12 +19,20 @@ export function DocumentUpload({
 }) {
   const router = useRouter();
   const busy = useRef(false);
-  const [pending, setPending] = useState(false);
+  const [saving, setPending] = useState(false);
+  const [refreshing, startTransition] = useTransition();
+  const pending = saving || refreshing;
+  const hintId = useId();
+  const [selected, setSelected] = useState<{
+    name: string;
+    size: number;
+  } | null>(null);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy.current) return;
+    setSaved(false);
     const element = event.currentTarget;
     const file = new FormData(element).get("file");
     if (
@@ -49,8 +58,9 @@ export function DocumentUpload({
         file,
       );
       element.reset();
+      setSelected(null);
       setSaved(true);
-      router.refresh();
+      startTransition(() => router.refresh());
     } catch (failure) {
       setError(
         failure instanceof Error
@@ -63,22 +73,52 @@ export function DocumentUpload({
     }
   }
   return (
-    <form className="workspace-form" onSubmit={submit}>
+    <form
+      className="workspace-form workflow-form upload-form"
+      aria-label="Upload private document"
+      aria-busy={pending}
+      onSubmit={submit}
+    >
       <label className="field-label">
         Upload supporting document
         <input
           type="file"
+          disabled={pending}
+          aria-describedby={hintId}
+          onChange={(event) => {
+            const file = event.target.files?.item(0);
+            setSelected(file ? { name: file.name, size: file.size } : null);
+            setError("");
+            setSaved(false);
+          }}
           name="file"
           required
           accept=".pdf,.png,.jpg,.jpeg,.txt"
         />
       </label>
-      <p className="workspace-note">
+      <p className="workspace-note" id={hintId}>
         PDF, PNG, JPEG or UTF-8 text · up to 3 MB. Files are retained as
         evidence; upload a corrected file rather than replacing history.
       </p>
+      {selected && (
+        <p className="upload-selection">
+          <strong>{selected.name}</strong>
+          <span>{displayFileSize(selected.size)}</span>
+        </p>
+      )}
+      {pending && (
+        <p className="upload-progress" role="status">
+          {saving
+            ? "Uploading privately. Please wait for confirmation…"
+            : "Refreshing your documents…"}
+        </p>
+      )}
       <WorkFeedback error={error} />
-      {saved && <p role="status">Document uploaded.</p>}
+      {saved && !pending && (
+        <p className="inline-success" role="status">
+          Document uploaded.
+        </p>
+      )}
       <Button type="submit" disabled={pending}>
         {pending ? "Uploading…" : "Upload privately"}
       </Button>
