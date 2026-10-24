@@ -5,6 +5,11 @@ import "@/styles/components.css";
 import "@/styles/forms.css";
 import "@/features/marketing/styles.css";
 import "@/features/workspace/styles.css";
+import "@/features/workspace/navigation.css";
+import "@/features/workspace/data-views.css";
+import "@/features/workspace/workflow.css";
+import "@/features/workspace/secondary-views.css";
+import "@/features/identity/styles.css";
 
 export const metadata: Metadata = {
   title: "MCA Software",

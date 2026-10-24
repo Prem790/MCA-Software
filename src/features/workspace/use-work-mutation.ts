@@ -1,24 +1,33 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { workspaceRequest } from "./api-client";
 export function useWorkMutation() {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [refreshing, startTransition] = useTransition();
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const busy = useRef(false);
+  const pending = saving || refreshing;
   async function run<T>(
     path: string,
     method: string,
     body?: unknown,
+    options?: { navigateTo?: (result: T) => string; successMessage?: string },
   ): Promise<T | null> {
-    if (busy.current) return null;
+    if (busy.current || pending) return null;
     busy.current = true;
-    setPending(true);
+    setSaving(true);
     setError("");
+    setNotice("");
     try {
       const result = await workspaceRequest<T>(path, method, body);
-      router.refresh();
+      setNotice(options?.successMessage ?? "Changes saved.");
+      startTransition(() => {
+        if (options?.navigateTo) router.push(options.navigateTo(result));
+        router.refresh();
+      });
       return result;
     } catch (failure) {
       setError(
@@ -29,8 +38,8 @@ export function useWorkMutation() {
       return null;
     } finally {
       busy.current = false;
-      setPending(false);
+      setSaving(false);
     }
   }
-  return { pending, error, run };
+  return { pending, error, notice, run };
 }

@@ -1,0 +1,285 @@
+.calendar-weekdays,
+.deadline-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.calendar-weekdays {
+  text-align: center;
+}
+.deadline-calendar {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 20px;
+}
+.deadline-calendar a {
+  display: grid;
+  border: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+/* Calendar, reports, team and edge states share the live product foundations. */
+.calendar-filter-form {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+.calendar-panel .workspace-pagination {
+  margin: 0 0 18px;
+  padding: 16px 0;
+}
+.calendar-panel .workspace-pagination h2 {
+  font-size: 21px;
+  color: var(--foreground);
+}
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 18px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.calendar-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.calendar-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.task-dot {
+  background: #3e6c8c;
+}
+.obligation-dot {
+  background: #865b3e;
+}
+.calendar-weekdays {
+  margin-bottom: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.deadline-calendar {
+  gap: 6px;
+}
+.deadline-calendar li {
+  min-width: 0;
+}
+.deadline-calendar a {
+  min-height: 110px;
+  padding: 9px;
+  gap: 6px;
+  align-content: start;
+  border-color: var(--border);
+  border-radius: 10px;
+  background: #fcfdf9;
+  color: var(--foreground);
+}
+.deadline-calendar a:hover {
+  background: var(--muted);
+  border-color: var(--control-border);
+}
+.deadline-calendar a[aria-current="date"] {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  background: #edf3e5;
+}
+.calendar-day-number {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.deadline-calendar a[data-today="true"] .calendar-day-number {
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+}
+.deadline-calendar .calendar-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.deadline-calendar .calendar-count-label {
+  font-size: inherit;
+}
+#day-agenda {
+  scroll-margin-top: 20px;
+}
+.report-advanced {
+  border: 1px solid var(--control-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #f9fbf5;
+}
+.report-advanced summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary);
+  padding: 4px 0;
+}
+.report-advanced > .report-filter-grid {
+  margin-top: 20px;
+}
+.export-feedback {
+  min-height: 22px;
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.role-guide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0;
+  margin: 20px 0;
+  list-style: none;
+}
+.role-guide li {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f6f9f1;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.role-guide strong {
+  display: block;
+  color: var(--foreground);
+}
+.team-table {
+  min-width: 860px;
+}
+.team-table td:last-child {
+  width: 56%;
+}
+.team-you {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 7px;
+  background: var(--muted);
+  border-radius: 5px;
+  color: var(--primary);
+  font-size: 11px;
+}
+.team-member-actions {
+  min-width: 330px;
+}
+.team-member-actions > .work-feedback {
+  margin-top: 14px;
+}
+.team-member-actions select {
+  min-height: 44px;
+}
+.edge-state {
+  max-width: 680px;
+  margin: 32px auto;
+  padding: 36px;
+}
+.edge-state-icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  background: var(--muted);
+  color: var(--primary);
+}
+.edge-state > p {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.edge-state-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+@media (max-width: 800px) {
+  .role-guide {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .calendar-panel.workspace-panel {
+    padding: 16px 12px;
+  }
+  .calendar-panel .workspace-pagination {
+    gap: 10px;
+  }
+  .calendar-panel .workspace-pagination h2 {
+    flex-basis: 100%;
+    order: -1;
+    font-size: 20px;
+  }
+  .deadline-calendar {
+    gap: 4px;
+  }
+  .deadline-calendar a {
+    padding: 5px 3px;
+    min-height: 88px;
+    border-radius: 7px;
+  }
+  .deadline-calendar .calendar-count-label {
+    display: none;
+  }
+  .calendar-day-number {
+    width: 24px;
+    height: 24px;
+  }
+  .calendar-legend {
+    gap: 8px 14px;
+  }
+  .calendar-panel input,
+  .calendar-panel select {
+    font-size: 16px;
+  }
+  .edge-state {
+    margin: 8px auto;
+    padding: 24px;
+  }
+  .edge-state-actions {
+    align-items: stretch;
+  }
+  .edge-state-actions > a,
+  .edge-state-actions > button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.danger-action {
+  color: #8c3f32;
+  border-color: #d8b3aa;
+  background: #fff9f6;
+}
+.role-guide-details {
+  margin: 16px 0;
+}
+.role-guide-details > summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 0;
+}
+.live-workspace .deadline-calendar a:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px white;
+}
