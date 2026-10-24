@@ -45,9 +45,34 @@ test("administrator persists company/director changes while staff remain read-on
   await page
     .getByLabel("Contact email (optional)", { exact: true })
     .fill("company@example.test");
-  await page
-    .getByRole("button", { name: "Create company", exact: true })
-    .click();
+  const createPage = new URL(page.url());
+  const createPath = createPage.pathname.replace(
+    /^\/workspace\/([^/]+)\/companies\/new$/,
+    "/api/firms/$1/companies",
+  );
+  // The first save and detail route compile on demand in the isolated dev
+  // server. Verify the save separately before waiting for its destination.
+  const [createdResponse] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.request().method() === "POST" &&
+        new URL(response.url()).pathname === createPath,
+      { timeout: 15000 },
+    ),
+    page.getByRole("button", { name: "Create company", exact: true }).click(),
+  ]);
+  expect(createdResponse.status()).toBe(201);
+  const created = (await createdResponse.json()) as { data: { id: string } };
+  expect(created.data).toMatchObject({
+    id: expect.any(String),
+    name: "Cedar Working Test Company",
+  });
+  const expectedDetail = new URL(createPage.href);
+  expectedDetail.pathname = expectedDetail.pathname.replace(
+    /\/companies\/new$/,
+    `/companies/${created.data.id}`,
+  );
+  await expect(page).toHaveURL(expectedDetail.href, { timeout: 15000 });
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Cedar Working Test Company",
   );
