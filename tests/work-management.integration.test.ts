@@ -237,6 +237,25 @@ it("creates recurring occurrences once, keeps the anchor and records each confir
   ).toHaveLength(1);
 });
 
+it("rejects forbidden management commands through their asynchronous contract", async () => {
+  const id = randomUUID();
+  const commands = [
+    () => obligations().saveTemplate(staff, {}, requestId()),
+    () => obligations().archiveTemplate(staff, id, requestId()),
+    () => obligations().create(staff, {}, requestId()),
+    () => obligations().update(staff, id, {}, requestId()),
+    () => obligations().next(staff, id, {}, requestId()),
+    () => tasks().create(staff, {}, requestId()),
+    () => tasks().update(staff, id, {}, requestId()),
+    () => tasks().addChecklist(staff, id, {}, requestId()),
+    () => tasks().removeChecklist(staff, id, randomUUID(), {}, requestId()),
+  ];
+  for (const command of commands) {
+    const result = command();
+    expect(result).toBeInstanceOf(Promise);
+    await expect(result).rejects.toMatchObject({ code: "FORBIDDEN" });
+  }
+});
 it("requires real confirmed dates and detects stale obligation edits", async () => {
   await expect(
     obligations().create(
@@ -244,14 +263,22 @@ it("requires real confirmed dates and detects stale obligation edits", async () 
       { ...obligationFields(), confirmed: false },
       requestId(),
     ),
-  ).rejects.toThrow();
+  ).rejects.toMatchObject({
+    issues: expect.arrayContaining([
+      expect.objectContaining({ path: ["confirmed"] }),
+    ]),
+  });
   await expect(
     obligations().create(
       admin,
       { ...obligationFields(), dueDate: "2027-02-30" },
       requestId(),
     ),
-  ).rejects.toThrow();
+  ).rejects.toMatchObject({
+    issues: expect.arrayContaining([
+      expect.objectContaining({ path: ["dueDate"] }),
+    ]),
+  });
   const record = await obligations().create(
     admin,
     obligationFields(),

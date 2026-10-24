@@ -45,7 +45,7 @@ export function pendingReviewWhere(actor: Actor) {
     eq(task.firmId, actor.firmId),
     eq(task.status, "submitted_for_review"),
     exists(
-      sql`select 1 from ${taskReview} where ${taskReview.firmId} = ${actor.firmId} and ${taskReview.taskId} = ${task.id} and ${taskReview.reviewerId} = ${actor.userId} and ${taskReview.outcome} = 'pending' and ${taskReview.submittedVersion} = ${task.version} - 1`,
+      sql`(select 1 from ${taskReview} where ${taskReview.firmId} = ${actor.firmId} and ${taskReview.taskId} = ${task.id} and ${taskReview.reviewerId} = ${actor.userId} and ${taskReview.outcome} = 'pending' and ${taskReview.submittedVersion} = ${task.version} - 1)`,
     ),
   );
 }

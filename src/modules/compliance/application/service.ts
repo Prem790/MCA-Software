@@ -29,14 +29,19 @@ export function complianceService(repository: ComplianceRepository) {
     template(actor: Actor, id: string) {
       return repository.template(actor.firmId, id);
     },
-    saveTemplate(actor: Actor, input: unknown, requestId: string, id?: string) {
+    async saveTemplate(
+      actor: Actor,
+      input: unknown,
+      requestId: string,
+      id?: string,
+    ) {
       return repository.saveTemplate(
         write(actor, requestId),
         id ? templateUpdate.parse(input) : templateInput.parse(input),
         id,
       );
     },
-    archiveTemplate(actor: Actor, id: string, requestId: string) {
+    async archiveTemplate(actor: Actor, id: string, requestId: string) {
       return repository.archiveTemplate(write(actor, requestId), id);
     },
     list(actor: Actor, query: unknown) {
@@ -49,20 +54,20 @@ export function complianceService(repository: ComplianceRepository) {
     detail(actor: Actor, id: string) {
       return repository.detail(actor.firmId, id);
     },
-    create(actor: Actor, input: unknown, requestId: string) {
+    async create(actor: Actor, input: unknown, requestId: string) {
       return repository.create(
         write(actor, requestId),
         obligationInput.parse(input),
       );
     },
-    update(actor: Actor, id: string, input: unknown, requestId: string) {
+    async update(actor: Actor, id: string, input: unknown, requestId: string) {
       return repository.update(
         write(actor, requestId),
         id,
         obligationUpdate.parse(input),
       );
     },
-    next(actor: Actor, id: string, input: unknown, requestId: string) {
+    async next(actor: Actor, id: string, input: unknown, requestId: string) {
       return repository.next(
         write(actor, requestId),
         id,

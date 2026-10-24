@@ -253,6 +253,13 @@ shared Prettier settings. Architecture rules live in
 Secret-scanning rules live in `config/gitleaks.toml`; CI passes that path
 explicitly. Local Gitleaks scans should also use `--config config/gitleaks.toml`.
 
+Dependency maintenance: the `@vercel/cli-config` override reuses the project's
+Zod 4.6.7 instead of its vulnerable pinned 4.1.11 dependency. This addresses
+[GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5), whose patched
+versions start at 4.6.6, while retaining the private Blob SDK. The repository
+maintainer should remove this override when the upstream dependency chain resolves
+to a patched Zod version without it, after checking document upload/download behavior.
+
 Owner validation workflow: the coding agent makes changes and reviews them
 statically, then hands over test/check commands and manual UI steps. Agent-run
 checks require an explicit request. Existing CI checks remain configured.

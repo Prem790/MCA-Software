@@ -36,31 +36,36 @@ export function taskService(repository: TaskRepository) {
         commentQuery.parse(query).commentPage,
       );
     },
-    create(actor: Actor, input: unknown, id: string) {
+    async create(actor: Actor, input: unknown, id: string) {
       return repository.create(manager(actor, id), taskInput.parse(input));
     },
-    update(actor: Actor, taskId: string, input: unknown, id: string) {
+    async update(actor: Actor, taskId: string, input: unknown, id: string) {
       return repository.update(
         manager(actor, id),
         taskId,
         taskUpdate.parse(input),
       );
     },
-    transition(actor: Actor, taskId: string, input: unknown, id: string) {
+    async transition(actor: Actor, taskId: string, input: unknown, id: string) {
       return repository.transition(
         { ...actor, requestId: id },
         taskId,
         statusInput.parse(input),
       );
     },
-    addChecklist(actor: Actor, taskId: string, input: unknown, id: string) {
+    async addChecklist(
+      actor: Actor,
+      taskId: string,
+      input: unknown,
+      id: string,
+    ) {
       return repository.addChecklist(
         manager(actor, id),
         taskId,
         checklistInput.parse(input),
       );
     },
-    toggleChecklist(
+    async toggleChecklist(
       actor: Actor,
       taskId: string,
       itemId: string,
@@ -74,7 +79,7 @@ export function taskService(repository: TaskRepository) {
         checklistToggle.parse(input),
       );
     },
-    removeChecklist(
+    async removeChecklist(
       actor: Actor,
       taskId: string,
       itemId: string,
@@ -88,7 +93,7 @@ export function taskService(repository: TaskRepository) {
         versionInput.parse(input).version,
       );
     },
-    comment(actor: Actor, taskId: string, input: unknown, id: string) {
+    async comment(actor: Actor, taskId: string, input: unknown, id: string) {
       return repository.comment(
         { ...actor, requestId: id },
         taskId,

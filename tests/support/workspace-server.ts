@@ -1,4 +1,5 @@
 import { cp, mkdtemp, rm, symlink } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomBytes } from "node:crypto";
@@ -65,6 +66,8 @@ if (!process.exitCode) {
     "tsconfig.json",
     "next-env.d.ts",
   ]) {
+    // The product no longer ships sample downloads; Git omits an empty public/.
+    if (name === "public" && !existsSync(name)) continue;
     await cp(name, join(isolated, name), { recursive: true });
   }
   await symlink(

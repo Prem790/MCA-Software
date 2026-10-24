@@ -225,6 +225,35 @@ it("aggregates live scoped counts and preserves unassigned/revoked workload", as
     (await reporting().dashboard(admin, { companyId })).counts.myReviews,
   ).toBe(0);
 });
+it("excludes stale review submissions from the dashboard and reviewer report", async () => {
+  const record = records[2]!;
+  await database.db
+    .update(task)
+    .set({ version: record.version + 1 })
+    .where(eq(task.id, record.id));
+  try {
+    const dashboard = await reporting().dashboard(manager, { companyId });
+    expect(dashboard.counts.pendingReview).toBe(1);
+    expect(dashboard.counts.myReviews).toBe(0);
+    expect(dashboard.reviewQueue).toEqual([]);
+    expect(
+      (
+        await reporting().report(manager, "tasks", {
+          companyId,
+          reviewer: "me",
+        })
+      ).total,
+    ).toBe(0);
+    expect(
+      (await reporting().dashboard(staff, { companyId })).counts.myReviews,
+    ).toBe(0);
+  } finally {
+    await database.db
+      .update(task)
+      .set({ version: record.version })
+      .where(eq(task.id, record.id));
+  }
+});
 it("shows calendar records by date, with confirmed obligations separate from tasks", async () => {
   const day = await reporting().calendar(staff, {
     companyId,
