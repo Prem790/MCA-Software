@@ -133,21 +133,19 @@ export function documentRepository(db: QueryDatabase) {
             "CONFLICT",
             "This company's 500-document pilot limit has been reached. Contact the administrator.",
           );
-        await tx
-          .insert(document)
-          .values({
-            id: file.id,
-            firmId: context.firmId,
-            companyId: input.companyId,
-            taskId: input.taskId ?? null,
-            uploadedBy: context.userId,
-            objectKey: file.key,
-            originalName: file.name,
-            mediaType: file.mediaType,
-            sizeBytes: file.sizeBytes,
-            sha256: file.sha256,
-            storageState: "pending",
-          });
+        await tx.insert(document).values({
+          id: file.id,
+          firmId: context.firmId,
+          companyId: input.companyId,
+          taskId: input.taskId ?? null,
+          uploadedBy: context.userId,
+          objectKey: file.key,
+          originalName: file.name,
+          mediaType: file.mediaType,
+          sizeBytes: file.sizeBytes,
+          sha256: file.sha256,
+          storageState: "pending",
+        });
       });
     },
     async finalize(context: Context, input: UploadInput, id: string) {
