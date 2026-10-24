@@ -1,25 +1,10 @@
-import { test, expect, type Page } from "@playwright/test";
-
-async function signIn(page: Page, email = "admin@example.test") {
-  await page.goto("/login");
-  await page.getByLabel("Email address", { exact: true }).fill(email);
-  await page
-    .getByLabel("Password", { exact: true })
-    .fill("test-only-password-12345");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await page
-    .getByRole("link", {
-      name: /Workspace Browser Test Firm.*Open firm dashboard/,
-    })
-    .click();
-  await expect(page).toHaveURL(/\/dashboard$/);
-  return new URL(page.url()).pathname.split("/")[2]!;
-}
+import { signInToFirm } from "../support/workspace-sign-in";
+import { test, expect } from "@playwright/test";
 
 test("calendar month/day links preserve company visibility and expose the selected-day agenda", async ({
   page,
 }) => {
-  const firmId = await signIn(page);
+  const firmId = await signInToFirm(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(
     `/workspace/${firmId}/calendar?month=2028-02&day=2028-02-01&archived=all`,
@@ -55,16 +40,18 @@ test("calendar month/day links preserve company visibility and expose the select
 test("collapsed report filters retain selections and report types keep only compatible scope", async ({
   page,
 }) => {
-  const firmId = await signIn(page);
+  const firmId = await signInToFirm(page);
   await page.goto(`/workspace/${firmId}/reports/tasks`);
   const filters = page.getByRole("form", {
     name: "Report filters",
     exact: true,
   });
   await filters.getByText("More filters", { exact: true }).click();
-  await filters.getByLabel("Status", { exact: true }).selectOption("completed");
   await filters
-    .getByLabel("Company status", { exact: true })
+    .getByRole("combobox", { name: "Status", exact: true })
+    .selectOption("completed");
+  await filters
+    .getByRole("combobox", { name: "Company status", exact: true })
     .selectOption("all");
   await filters
     .getByLabel("Search titles", { exact: true })
@@ -75,7 +62,9 @@ test("collapsed report filters retain selections and report types keep only comp
     .click();
   await expect(page).toHaveURL(/status=completed/);
   expect(new URL(page.url()).searchParams.get("archived")).toBe("all");
-  await expect(filters.getByLabel("Status", { exact: true })).toBeVisible();
+  await expect(
+    filters.getByRole("combobox", { name: "Status", exact: true }),
+  ).toBeVisible();
   const types = page.getByRole("navigation", {
     name: "Report types",
     exact: true,
@@ -95,11 +84,11 @@ test("collapsed report filters retain selections and report types keep only comp
 test("team confirmations can be cancelled and last-administrator protection stays visible", async ({
   page,
 }) => {
-  const firmId = await signIn(page);
+  const firmId = await signInToFirm(page);
   await page.goto(`/workspace/${firmId}/team`);
   const row = page.getByRole("row").filter({ hasText: "admin@example.test" });
   await row
-    .getByLabel("Role for admin@example.test", { exact: true })
+    .getByRole("combobox", { name: "Role for admin@example.test", exact: true })
     .selectOption("staff");
   await row.getByRole("button", { name: "Save role", exact: true }).click();
   await expect(
@@ -122,14 +111,17 @@ test("team confirmations can be cancelled and last-administrator protection stay
   await expect(page).toHaveURL(/\/team$/);
   await page.reload();
   await expect(
-    row.getByLabel("Role for admin@example.test", { exact: true }),
+    row.getByRole("combobox", {
+      name: "Role for admin@example.test",
+      exact: true,
+    }),
   ).toHaveValue("admin");
 });
 
 test("export failure allows retry and successful export announces download initiation", async ({
   page,
 }) => {
-  const firmId = await signIn(page);
+  const firmId = await signInToFirm(page);
   await page.goto(`/workspace/${firmId}/reports/tasks`);
   const controls = page.getByRole("group", {
     name: "Report export",

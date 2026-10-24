@@ -40,7 +40,7 @@ test("administrator persists company/director changes while staff remain read-on
   ).toBeVisible();
   await page.getByRole("link", { name: "Add company", exact: true }).click();
   await page
-    .getByLabel("Company name", { exact: true })
+    .getByRole("textbox", { name: "Company name", exact: true })
     .fill("Cedar Working Test Company");
   await page
     .getByLabel("Contact email (optional)", { exact: true })
@@ -53,9 +53,9 @@ test("administrator persists company/director changes while staff remain read-on
   );
   const companyUrl = page.url();
   await page.reload();
-  await expect(page.getByLabel("Company name", { exact: true })).toHaveValue(
-    "Cedar Working Test Company",
-  );
+  await expect(
+    page.getByRole("textbox", { name: "Company name", exact: true }),
+  ).toHaveValue("Cedar Working Test Company");
   await page
     .getByLabel("Address (optional)", { exact: true })
     .fill("Fictional browser test address");
@@ -64,7 +64,7 @@ test("administrator persists company/director changes while staff remain read-on
   await page.getByText("Add a director", { exact: true }).click();
   const add = page.getByRole("form", { name: "Add director", exact: true });
   await add
-    .getByLabel("Director name", { exact: true })
+    .getByRole("textbox", { name: "Director name", exact: true })
     .fill("Alex Test Person");
   await add.getByRole("button", { name: "Add director", exact: true }).click();
   await expect(

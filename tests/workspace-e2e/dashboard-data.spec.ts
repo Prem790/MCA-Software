@@ -1,24 +1,11 @@
+import { signInToFirm } from "../support/workspace-sign-in";
 import { test, expect } from "@playwright/test";
 
 test("dashboard drill-down retains company scope and renders saved task labels and dates", async ({
   page,
 }) => {
-  await page.goto("/login");
-  await page
-    .getByLabel("Email address", { exact: true })
-    .fill("admin@example.test");
-  await page
-    .getByLabel("Password", { exact: true })
-    .fill("test-only-password-12345");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await page
-    .getByRole("link", {
-      name: /Workspace Browser Test Firm.*Open firm dashboard/,
-    })
-    .click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  const firmId = await signInToFirm(page);
   const dashboard = page.url();
-  const firmId = new URL(dashboard).pathname.split("/")[2]!;
   const origin = new URL(dashboard).origin;
   const companyResponse = await page.request.post(
     `/api/firms/${firmId}/companies`,
@@ -50,7 +37,7 @@ test("dashboard drill-down retains company scope and renders saved task labels a
   expect(taskResponse.status()).toBe(201);
   await page.reload();
   await page
-    .getByLabel("Company", { exact: true })
+    .getByRole("combobox", { name: "Company", exact: true })
     .selectOption(company.data.id);
   await page
     .getByRole("button", { name: "Apply company", exact: true })

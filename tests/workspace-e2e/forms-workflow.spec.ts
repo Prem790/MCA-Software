@@ -1,30 +1,13 @@
-import { test, expect, type Page } from "@playwright/test";
-
-async function signIn(page: Page) {
-  await page.goto("/login");
-  await page
-    .getByLabel("Email address", { exact: true })
-    .fill("admin@example.test");
-  await page
-    .getByLabel("Password", { exact: true })
-    .fill("test-only-password-12345");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await page
-    .getByRole("link", {
-      name: /Workspace Browser Test Firm.*Open firm dashboard/,
-    })
-    .click();
-  await expect(page).toHaveURL(/\/dashboard$/);
-  return new URL(page.url()).pathname.split("/")[2]!;
-}
+import { signInToFirm } from "../support/workspace-sign-in";
+import { test, expect } from "@playwright/test";
 
 test("company form preserves failed entries and stays busy through create navigation", async ({
   page,
 }) => {
-  const firmId = await signIn(page);
+  const firmId = await signInToFirm(page);
   await page.goto(`/workspace/${firmId}/companies/new`);
   const form = page.getByRole("form", { name: "Create company", exact: true });
-  const name = form.getByLabel("Company name", { exact: true });
+  const name = form.getByRole("textbox", { name: "Company name", exact: true });
   await name.fill("UX 4 Company Form Test");
   const endpoint = `**/api/firms/${firmId}/companies`;
   await page.route(endpoint, (route) =>
@@ -90,7 +73,7 @@ test("company form preserves failed entries and stays busy through create naviga
 test("task checklist confirmation and comment retry preserve the saved workflow", async ({
   page,
 }) => {
-  const firmId = await signIn(page);
+  const firmId = await signInToFirm(page);
   const origin = new URL(page.url()).origin;
   const companyResponse = await page.request.post(
     `/api/firms/${firmId}/companies`,
