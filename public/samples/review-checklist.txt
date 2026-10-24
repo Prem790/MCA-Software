@@ -1,8 +1,0 @@
-SAMPLE RECORDS REVIEW CHECKLIST
-
-Fictional demonstration only. Not verified legal guidance.
-
-[ ] Collect supporting information.
-[ ] Check against the sample company record.
-[ ] Prepare a draft for human review.
-[ ] Record questions and next steps.
