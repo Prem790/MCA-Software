@@ -36,7 +36,7 @@ test("administrator persists company/director changes while staff remain read-on
     .getByRole("link", { name: "Companies", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "No companies yet" }),
+    page.getByRole("heading", { name: "No active companies" }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Add company", exact: true }).click();
   await page
